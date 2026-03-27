@@ -2,34 +2,189 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Controle de Lançamentos</title>
+  <style>
+    :root {
+      --bg: #f8f5f1;
+      --panel: #ffffff;
+      --text: #2a211d;
+      --muted: #76645a;
+      --line: #decfc5;
+      --primary: #0f766e;
+      --primary-hover: #0d5f59;
+      --danger: #a11919;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Verdana", "Tahoma", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    main {
+      width: min(980px, 94vw);
+      margin: 24px auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .header,
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 20px rgba(44, 33, 29, 0.05);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1, h2 {
+      margin: 0;
+    }
+
+    #user {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    input, select, button {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    input[name="descricao"] {
+      grid-column: span 2;
+    }
+
+    button {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+    }
+
+    #logout {
+      width: auto;
+      background: #5b4b43;
+      padding-inline: 16px;
+    }
+
+    #logout:hover {
+      background: #4a3d36;
+    }
+
+    .table-wrap {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      background: #f6efe8;
+    }
+
+    .del {
+      background: var(--danger);
+    }
+
+    .del:hover {
+      background: #991b1b;
+    }
+
+    @media (max-width: 900px) {
+      form {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      input[name="descricao"] {
+        grid-column: span 2;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Lançamentos</h1>
-  <div id="user"></div>
-  <button id="logout">Sair</button>
+  <main>
+    <section class="header">
+      <h1>Lançamentos</h1>
+      <div id="user"></div>
+      <button id="logout">Sair</button>
+    </section>
 
-  <h2>Novo lançamento</h2>
-  <form id="form">
-    <input name="descricao" placeholder="Descrição" required />
-    <input name="data_lancamento" type="date" required />
-    <input name="valor" type="number" step="0.01" required />
-    <select name="tipo_lancamento">
-      <option value="RECEITA">RECEITA</option>
-      <option value="DESPESA">DESPESA</option>
-    </select>
-    <select name="situacao">
-      <option value="PAGO">PAGO</option>
-      <option value="PENDENTE">PENDENTE</option>
-    </select>
-    <button type="submit">Salvar</button>
-  </form>
+    <section class="card">
+      <h2>Novo lançamento</h2>
+      <form id="form">
+        <input name="descricao" placeholder="Descrição" required />
+        <input name="data_lancamento" type="date" required />
+        <input name="valor" type="number" step="0.01" required />
+        <select name="tipo_lancamento">
+          <option value="RECEITA">RECEITA</option>
+          <option value="DESPESA">DESPESA</option>
+        </select>
+        <select name="situacao">
+          <option value="PAGO">PAGO</option>
+          <option value="PENDENTE">PENDENTE</option>
+        </select>
+        <button type="submit">Salvar</button>
+      </form>
+    </section>
 
-  <h2>Lista</h2>
-  <table border="1" id="table">
-    <thead><tr><th>ID</th><th>Descrição</th><th>Data</th><th>Valor</th><th>Tipo</th><th>Situação</th><th>Ações</th></tr></thead>
-    <tbody></tbody>
-  </table>
+    <section class="card table-wrap">
+      <h2>Lista</h2>
+      <table id="table">
+        <thead><tr><th>ID</th><th>Descrição</th><th>Data</th><th>Valor</th><th>Tipo</th><th>Situação</th><th>Ações</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
 
   <script src="/app.js"></script>
 </body>

@@ -11,7 +11,6 @@ async function initDatabase(): Promise<void> {
     await pool.query(sql);
     console.log("Banco inicializado com sucesso.");
 
-    // Hash any plaintext passwords using MD5 (simple heuristic)
     const users = await pool.query("SELECT id, senha FROM usuario");
     for (const row of users.rows) {
       const { id, senha } = row as { id: number; senha: string };
