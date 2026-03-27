@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Controle de Lançamentos</title>
+</head>
+<body>
+  <h1>Lançamentos</h1>
+  <div id="user"></div>
+  <button id="logout">Sair</button>
+
+  <h2>Novo lançamento</h2>
+  <form id="form">
+    <input name="descricao" placeholder="Descrição" required />
+    <input name="data_lancamento" type="date" required />
+    <input name="valor" type="number" step="0.01" required />
+    <select name="tipo_lancamento">
+      <option value="RECEITA">RECEITA</option>
+      <option value="DESPESA">DESPESA</option>
+    </select>
+    <select name="situacao">
+      <option value="PAGO">PAGO</option>
+      <option value="PENDENTE">PENDENTE</option>
+    </select>
+    <button type="submit">Salvar</button>
+  </form>
+
+  <h2>Lista</h2>
+  <table border="1" id="table">
+    <thead><tr><th>ID</th><th>Descrição</th><th>Data</th><th>Valor</th><th>Tipo</th><th>Situação</th><th>Ações</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="/app.js"></script>
+</body>
+</html>

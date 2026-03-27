@@ -19,12 +19,12 @@ CREATE TABLE lancamento (
 );
 
 INSERT INTO usuario (nome, login, senha, situacao)
-VALUES ('Administrador', 'admin', '123456', 'ATIVO')
+VALUES ('Administrador', 'admin', MD5('123456'), 'ATIVO')
 ON CONFLICT (login) DO NOTHING;
 
 INSERT INTO lancamento (descricao, data_lancamento, valor, tipo_lancamento, situacao) VALUES
-('Salario mensal', '2026-03-05', 4500.00, 'RECEITA', 'PAGO'),
-('Freelance website', '2026-03-08', 1200.00, 'RECEITA', 'PAGO'),
+('Salario mensal', '2026-03-05', 2000.00, 'RECEITA', 'PAGO'),
+('Cortar grama do vizinho', '2026-03-08', 1200.00, 'RECEITA', 'PAGO'),
 ('Aluguel', '2026-03-10', 1500.00, 'DESPESA', 'PAGO'),
 ('Conta de energia', '2026-03-11', 280.40, 'DESPESA', 'PENDENTE'),
 ('Internet', '2026-03-12', 120.00, 'DESPESA', 'PAGO'),
