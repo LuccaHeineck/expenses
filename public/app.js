@@ -130,6 +130,38 @@ async function initApp() {
     window.location.href = "/login";
   });
 
+  document.getElementById("export-pdf").addEventListener("click", async () => {
+    const button = document.getElementById("export-pdf");
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = "Gerando PDF...";
+
+    try {
+      const res = await fetch("/api/lancamentos/export/pdf", {
+        credentials: "same-origin",
+      });
+
+      if (!res.ok) {
+        throw new Error("Erro ao exportar PDF");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "lancamentos.pdf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      alert("Não foi possível gerar o PDF.");
+    } finally {
+      button.disabled = false;
+      button.textContent = originalLabel;
+    }
+  });
+
   const form = document.getElementById("form");
   const emailInput = form.querySelector('input[name="email"]');
   const savedEmail = localStorage.getItem(notificationEmailKey);

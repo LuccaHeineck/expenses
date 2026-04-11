@@ -3,8 +3,14 @@ import LancamentoService from '../services/LancamentoService';
 import EmailService from '../services/EmailService';
 import SessionStore from '../services/SessionStore';
 import { createRequireAuth } from '../middleware/auth';
+import PdfExportService from '../services/PdfExportService';
 
-export function createLancamentoRouter(lancService: LancamentoService, emailService: EmailService, sessionStore: SessionStore) {
+export function createLancamentoRouter(
+  lancService: LancamentoService,
+  emailService: EmailService,
+  sessionStore: SessionStore,
+  pdfExportService: PdfExportService
+) {
   const router = Router();
   const requireAuth = createRequireAuth(sessionStore);
 
@@ -14,6 +20,16 @@ export function createLancamentoRouter(lancService: LancamentoService, emailServ
       res.json(rows);
     } catch (error) {
       console.error('Erro ao listar lancamentos:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  router.get('/lancamentos/export/pdf', requireAuth, async (_req: Request, res: Response) => {
+    try {
+      const rows = await lancService.list();
+      pdfExportService.exportLancamentos(rows, res);
+    } catch (error) {
+      console.error('Erro ao exportar lancamentos para PDF:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });

@@ -64,6 +64,15 @@
       overflow: hidden;
     }
 
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
     .header::after {
       content: "";
       position: absolute;
@@ -175,6 +184,18 @@
 
     #logout:hover {
       background: var(--secondary-hover);
+    }
+
+    #export-pdf {
+      width: auto;
+      background: var(--primary);
+      padding-inline: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #export-pdf:hover {
+      background: var(--primary-hover);
     }
 
     .table-wrap {
@@ -377,6 +398,7 @@
         margin-right: 0;
       }
     }
+
   </style>
 </head>
 <body>
@@ -387,7 +409,10 @@
         <p class="subtitle">Cadastre, edite e acompanhe suas receitas e despesas</p>
       </div>
       <div id="user"></div>
-      <button id="logout">Sair</button>
+      <div class="header-actions">
+        <button id="export-pdf" type="button">Exportar para PDF</button>
+        <button id="logout">Sair</button>
+      </div>
     </section>
 
     <section class="card">

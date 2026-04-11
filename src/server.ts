@@ -5,6 +5,7 @@ import SessionStore from './services/SessionStore';
 import AuthService from './services/AuthService';
 import EmailService from './services/EmailService';
 import LancamentoService from './services/LancamentoService';
+import PdfExportService from './services/PdfExportService';
 import { createAuthRouter } from './routes/authRoutes';
 import { createLancamentoRouter } from './routes/lancamentoRoutes';
 import { createPageRouter } from './routes/pageRoutes';
@@ -21,8 +22,9 @@ const sessionStore = new SessionStore();
 const authService = new AuthService(sessionStore);
 const lancService = new LancamentoService();
 const emailService = new EmailService();
+const pdfExportService = new PdfExportService();
 app.use('/api', createAuthRouter(authService, sessionStore));
-app.use('/api', createLancamentoRouter(lancService, emailService, sessionStore));
+app.use('/api', createLancamentoRouter(lancService, emailService, sessionStore, pdfExportService));
 app.use(createPageRouter());
 
 app.listen(port, () => {
