@@ -202,6 +202,34 @@
       overflow: hidden;
     }
 
+    .filters {
+      display: grid;
+      grid-template-columns: 0.7fr 2fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .filters input,
+    .filters select,
+    .filters button {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      background: #fbfdff;
+      color: var(--text);
+    }
+
+    .filters button {
+      background: var(--secondary);
+      color: #fff;
+    }
+
+    .filters button:hover {
+      background: var(--secondary-hover);
+    }
+
     #table td input,
     #table td select {
       width: 100%;
@@ -280,6 +308,10 @@
 
     @media (max-width: 900px) {
       form {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .filters {
         grid-template-columns: 1fr 1fr;
       }
 
@@ -377,6 +409,10 @@
         grid-template-columns: 1fr;
       }
 
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
       input[name="descricao"] {
         grid-column: span 1;
       }
@@ -436,6 +472,22 @@
 
     <section class="card table-wrap">
       <h2>Lista</h2>
+      <div class="filters">
+        <input id="filter-id" placeholder="Filtrar ID" inputmode="numeric" />
+        <input id="filter-descricao" placeholder="Filtrar descrição" />
+        <input id="filter-data" type="date" />
+        <input id="filter-valor" placeholder="Filtrar valor" inputmode="decimal" />
+        <select id="filter-tipo">
+          <option value="">Todos os tipos</option>
+          <option value="RECEITA">RECEITA</option>
+          <option value="DESPESA">DESPESA</option>
+        </select>
+        <select id="filter-situacao">
+          <option value="">Todas as situações</option>
+          <option value="PAGO">PAGO</option>
+          <option value="PENDENTE">PENDENTE</option>
+        </select>
+      </div>
       <table id="table">
         <thead><tr><th>ID</th><th>Descrição</th><th>Data</th><th>Valor</th><th>Tipo</th><th>Situação</th><th>Ações</th></tr></thead>
         <tbody></tbody>

@@ -32,9 +32,24 @@ async function fetchLancamentos() {
 let currentItems = [];
 let editingId = null;
 const notificationEmailKey = "notificationEmail";
+const filterState = {
+  id: "",
+  descricao: "",
+  data: "",
+  valor: "",
+  tipo_lancamento: "",
+  situacao: "",
+};
 
 function getNotificationEmail() {
   return (localStorage.getItem(notificationEmailKey) || "").trim();
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function toInputDate(dateValue) {
@@ -44,6 +59,52 @@ function toInputDate(dateValue) {
 
 function findItemById(id) {
   return currentItems.find((it) => String(it.id) === String(id));
+}
+
+function getFilteredItems() {
+  return currentItems.filter((item) => {
+    const matchesId =
+      !filterState.id || String(item.id).includes(filterState.id);
+    const matchesDescricao =
+      !filterState.descricao ||
+      normalizeText(item.descricao).includes(
+        normalizeText(filterState.descricao),
+      );
+    const matchesData =
+      !filterState.data ||
+      toInputDate(item.data_lancamento) === filterState.data;
+    const matchesValor =
+      !filterState.valor || String(item.valor).includes(filterState.valor);
+    const matchesTipo =
+      !filterState.tipo_lancamento ||
+      item.tipo_lancamento === filterState.tipo_lancamento;
+    const matchesSituacao =
+      !filterState.situacao || item.situacao === filterState.situacao;
+
+    return (
+      matchesId &&
+      matchesDescricao &&
+      matchesData &&
+      matchesValor &&
+      matchesTipo &&
+      matchesSituacao
+    );
+  });
+}
+
+function syncFiltersFromUi() {
+  filterState.id = document.getElementById("filter-id").value.trim();
+  filterState.descricao = document
+    .getElementById("filter-descricao")
+    .value.trim();
+  filterState.data = document.getElementById("filter-data").value;
+  filterState.valor = document.getElementById("filter-valor").value.trim();
+  filterState.tipo_lancamento = document.getElementById("filter-tipo").value;
+  filterState.situacao = document.getElementById("filter-situacao").value;
+}
+
+function renderCurrentTable() {
+  renderTable(getFilteredItems());
 }
 
 async function saveInlineEdit(id, row) {
@@ -169,6 +230,25 @@ async function initApp() {
     emailInput.value = savedEmail;
   }
 
+  const filterInputs = [
+    "filter-id",
+    "filter-descricao",
+    "filter-data",
+    "filter-valor",
+    "filter-tipo",
+    "filter-situacao",
+  ];
+  for (const id of filterInputs) {
+    document.getElementById(id).addEventListener("input", () => {
+      syncFiltersFromUi();
+      renderCurrentTable();
+    });
+    document.getElementById(id).addEventListener("change", () => {
+      syncFiltersFromUi();
+      renderCurrentTable();
+    });
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
@@ -202,13 +282,13 @@ async function initApp() {
         const item = findItemById(id);
         if (!item) return;
         editingId = item.id;
-        renderTable(currentItems);
+        renderCurrentTable();
         return;
       }
 
       if (target.classList.contains("cancel")) {
         editingId = null;
-        renderTable(currentItems);
+        renderCurrentTable();
         return;
       }
 
@@ -240,7 +320,7 @@ async function initApp() {
 
 async function loadAndRender() {
   currentItems = await fetchLancamentos();
-  renderTable(currentItems);
+  renderCurrentTable();
 }
 
 if (location.pathname === "/app") {
