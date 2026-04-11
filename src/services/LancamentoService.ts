@@ -32,4 +32,16 @@ export default class LancamentoService {
     const result = await pool.query('DELETE FROM lancamento WHERE id=$1', [id]);
     return (result.rowCount ?? 0) > 0;
   }
+
+  async update(id: string | number, payload: Partial<Lancamento>) {
+    const fields = Object.keys(payload);
+    const values = Object.values(payload);
+    const setClause = fields.map((field, index) => `${field}=$${index + 2}`).join(', ');
+    const result = await pool.query(
+      `UPDATE lancamento SET ${setClause} WHERE id=$1 RETURNING id, descricao, data_lancamento, valor, tipo_lancamento, situacao`,
+      [id, ...values]
+    );
+    return result.rows[0];
+  }
+
 }

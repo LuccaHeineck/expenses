@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import SessionStore from './services/SessionStore';
 import AuthService from './services/AuthService';
+import EmailService from './services/EmailService';
 import LancamentoService from './services/LancamentoService';
 import { createAuthRouter } from './routes/authRoutes';
 import { createLancamentoRouter } from './routes/lancamentoRoutes';
@@ -19,8 +20,9 @@ app.use(express.static(path.resolve(process.cwd(), "public"), { index: false }))
 const sessionStore = new SessionStore();
 const authService = new AuthService(sessionStore);
 const lancService = new LancamentoService();
+const emailService = new EmailService();
 app.use('/api', createAuthRouter(authService, sessionStore));
-app.use('/api', createLancamentoRouter(lancService, sessionStore));
+app.use('/api', createLancamentoRouter(lancService, emailService, sessionStore));
 app.use(createPageRouter());
 
 app.listen(port, () => {

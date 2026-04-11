@@ -6,19 +6,22 @@
   <title>Login</title>
   <style>
     :root {
-      --bg: #f8f5f1;
+      --bg: #f4f7f5;
+      --bg-shade: #dce8e2;
       --card: #ffffff;
-      --text: #2a211d;
-      --muted: #76645a;
-      --line: #decfc5;
-      --primary: #0f766e;
-      --primary-hover: #0d5f59;
-      --danger: #a11919;
+      --text: #1f2933;
+      --muted: #52606d;
+      --line: #d9e2ec;
+      --primary: #12726b;
+      --primary-hover: #0e5e59;
+      --secondary: #334e68;
+      --danger: #b42318;
+      --shadow: 0 14px 36px rgba(15, 23, 42, 0.16);
     }
 
     * {
       box-sizing: border-box;
-      font-family: "Verdana", "Tahoma", sans-serif;
+      font-family: "Segoe UI", "Gill Sans", "Trebuchet MS", sans-serif;
     }
 
     body {
@@ -27,89 +30,162 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(18, 114, 107, 0.2), transparent 38%),
+        radial-gradient(circle at 90% 0%, rgba(51, 78, 104, 0.17), transparent 35%),
+        linear-gradient(180deg, var(--bg), var(--bg-shade));
       color: var(--text);
+      padding: 16px;
     }
 
     .card {
-      width: min(420px, 92vw);
+      width: min(460px, 94vw);
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 18px;
       padding: 24px;
-      box-shadow: 0 8px 18px rgba(44, 33, 29, 0.08);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: -80px;
+      top: -95px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(18, 114, 107, 0.24), transparent 70%);
+      pointer-events: none;
+    }
+
+    .intro {
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
-      margin: 0 0 16px;
-      font-size: 1.5rem;
+      margin: 0;
+      font-size: clamp(1.4rem, 2.3vw, 1.8rem);
       font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
     }
 
     form {
       display: grid;
-      gap: 12px;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
     }
 
     label {
       display: grid;
       gap: 6px;
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.88rem;
+      letter-spacing: 0.01em;
     }
 
     input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 11px 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
       outline: none;
       font-size: 0.95rem;
       color: var(--text);
-      background: #fff;
+      background: #fbfdff;
     }
 
     input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+      box-shadow: 0 0 0 3px rgba(18, 114, 107, 0.14);
     }
 
     button {
-      margin-top: 6px;
+      margin-top: 8px;
       border: none;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 11px 14px;
       color: white;
       background: var(--primary);
       cursor: pointer;
       font-weight: 600;
+      font-size: 0.92rem;
+      transition: transform 120ms ease, filter 120ms ease, background-color 120ms ease;
     }
 
     button:hover {
       background: var(--primary-hover);
+      transform: translateY(-1px);
+      filter: brightness(1.03);
     }
 
     #msg {
-      margin-top: 12px;
+      margin-top: 14px;
       min-height: 20px;
       color: var(--danger);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--line);
+      color: var(--secondary);
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 560px) {
+      .card {
+        border-radius: 14px;
+        padding: 18px;
+      }
+
+      .brand {
+        font-size: 0.76rem;
+      }
     }
   </style>
 </head>
 <body>
   <main class="card">
-    <h1>Login</h1>
+    <div class="intro">
+      <h1>Entrar</h1>
+      <p class="sub">Acesse para gerenciar seus lançamentos financeiros.</p>
+    </div>
     <form id="loginForm">
       <div>
-        <label>Login: <input name="login" required /></label>
+        <label>Login
+          <input name="login" required />
+        </label>
       </div>
       <div>
-        <label>Senha: <input name="senha" type="password" required /></label>
+        <label>Senha
+          <input name="senha" type="password" required />
+        </label>
       </div>
       <button type="submit">Entrar</button>
     </form>
     <div id="msg"></div>
+    <div class="brand">Controle Financeiro</div>
   </main>
   <script src="/app.js"></script>
   <script>
