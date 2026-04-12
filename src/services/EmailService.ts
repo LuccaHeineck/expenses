@@ -59,4 +59,18 @@ export default class EmailService {
 
     await this.sendEmail(to.trim(), subject, body);
   }
+
+  async testConnection(): Promise<boolean> {
+    if (!this.transporter) {
+      console.warn('SMTP não configurado. Teste de conexão ignorado.');
+      return true;
+    }
+    try {
+      await this.transporter.verify();
+      return true;
+    } catch (error) {
+      console.error('Erro ao testar conexão SMTP:', error);
+      return false;
+    }
+  }
 }
