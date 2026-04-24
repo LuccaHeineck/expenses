@@ -1,27 +1,29 @@
-import pool from '../db';
 import { createHash } from 'crypto';
 import SessionStore, { SessionUser } from './SessionStore';
+import UsuarioRepository from '../repositories/UsuarioRepository';
 
 export default class AuthService {
-  constructor(private store: SessionStore) {}
+  constructor(
+    private store: SessionStore,
+    private usuarioRepository: UsuarioRepository = new UsuarioRepository(),
+  ) {}
 
   private md5(s: string) {
     return createHash('md5').update(s).digest('hex');
   }
 
   async login(login: string, senha: string): Promise<{ user: SessionUser; token: string } | null> {
-    const result = await pool.query('SELECT id, nome, login, senha, situacao FROM usuario WHERE login = $1', [login]);
+    const userRow = await this.usuarioRepository.findByLogin(login);
 
-    if (result.rowCount === 0) return null;
-    
-    const userRow = result.rows[0];
+    if (!userRow) return null;
+
     const hash = this.md5(senha);
-    
+
     if (hash !== userRow.senha) return null;
-    
+
     const user: SessionUser = { id: userRow.id, nome: userRow.nome, login: userRow.login, situacao: userRow.situacao };
     const token = this.store.create(user);
-    
+
     return { user, token };
   }
 
