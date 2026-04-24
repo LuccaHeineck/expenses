@@ -21,7 +21,7 @@ function createMockResponse() {
   return res;
 }
 
-describe('Testes de Exportação para PDF', () => {
+describe('PDF Export', () => {
   test('exportLancamentos configura headers e gera saída PDF', async () => {
     const pdfService = new PdfExportService();
     const res = createMockResponse();

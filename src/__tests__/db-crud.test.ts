@@ -1,7 +1,7 @@
 import { describe, it, test, expect, beforeAll, beforeEach, afterEach, afterAll } from '@jest/globals';
 import pool from '../db';
 
-describe('Testes de Banco de Dados', () => {
+describe('DB CRUD', () => {
     let client: any;
 
     // Para manter DB limpo, fazemos rollback depois de todas alterações

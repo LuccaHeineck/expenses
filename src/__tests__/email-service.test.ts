@@ -1,7 +1,7 @@
 import { describe, test, expect, jest, afterEach } from '@jest/globals';
 import EmailService from '../services/EmailService';
 
-describe('Testes de Email', () => {
+describe('Email Service', () => {
     afterEach(() => {
         jest.restoreAllMocks();
     });

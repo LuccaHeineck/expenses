@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import SessionStore from '../services/SessionStore';
 
-describe('Testes do SessionStore', () => {
+describe('Session Store', () => {
   test('create/get/delete mantém o ciclo de vida da sessão consistente', () => {
     const store = new SessionStore();
     const user = { id: 1, nome: 'Usuário', login: 'user', situacao: 'ATIVO' };

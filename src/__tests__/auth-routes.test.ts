@@ -4,7 +4,7 @@ import request from 'supertest';
 import { createAuthRouter } from '../routes/authRoutes';
 import SessionStore from '../services/SessionStore';
 
-describe('Testes de Rotas de Autenticação', () => {
+describe('Auth Routes', () => {
   test('POST /api/login retorna 400 quando campos obrigatórios faltam', async () => {
     const authService = {
       login: async () => null,

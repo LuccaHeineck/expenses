@@ -1,7 +1,7 @@
 import { describe, expect, test, jest } from '@jest/globals';
 import { createRequireAuth, getTokenFromReq } from '../middleware/auth';
 
-describe('Testes de Middleware de Autenticação', () => {
+describe('Auth Middleware', () => {
   test('getTokenFromReq retorna token do header Authorization', () => {
     const req = { headers: { authorization: 'Bearer token-123' } } as any;
 

@@ -4,7 +4,7 @@ import request from 'supertest';
 import SessionStore from '../services/SessionStore';
 import { createLancamentoRouter } from '../routes/lancamentoRoutes';
 
-describe('Testes de Validação das Rotas de Lançamento', () => {
+describe('Lancamento Routes', () => {
   test('POST /api/lancamentos retorna 400 quando email de notificação está ausente', async () => {
     const lancService = {
       list: jest.fn(),
