@@ -7,6 +7,7 @@ export type Lancamento = {
   valor: number;
   tipo_lancamento: string;
   situacao: string;
+  usuario_id: number;
 };
 
 export default class LancamentoService {

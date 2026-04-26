@@ -1,4 +1,4 @@
-import { date, numeric, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
+import { date, integer, numeric, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
 
 export const usuario = pgTable('usuario', {
   id: serial('id').primaryKey(),
@@ -15,6 +15,7 @@ export const lancamento = pgTable('lancamento', {
   valor: numeric('valor', { precision: 12, scale: 2, mode: 'number' }).notNull(),
   tipo_lancamento: varchar('tipo_lancamento', { length: 20 }).notNull(),
   situacao: varchar('situacao', { length: 20 }).notNull(),
+  usuario_id: integer('usuario_id').notNull().references(() => usuario.id),
 });
 
 export type Usuario = typeof usuario.$inferSelect;

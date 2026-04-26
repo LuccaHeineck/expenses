@@ -1,0 +1,1 @@
+ALTER TABLE "lancamento" ADD COLUMN "add" varchar(255);

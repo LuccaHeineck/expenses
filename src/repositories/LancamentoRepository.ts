@@ -9,6 +9,7 @@ export type LancamentoRecord = {
   valor: number;
   tipo_lancamento: string;
   situacao: string;
+  usuario_id: number;
 };
 
 function mapLancamento(row: typeof lancamento.$inferSelect) {
@@ -19,6 +20,7 @@ function mapLancamento(row: typeof lancamento.$inferSelect) {
     valor: Number(row.valor),
     tipo_lancamento: row.tipo_lancamento,
     situacao: row.situacao,
+    usuario_id: row.usuario_id,
   };
 }
 
@@ -41,6 +43,7 @@ export default class LancamentoRepository {
         valor: payload.valor,
         tipo_lancamento: payload.tipo_lancamento,
         situacao: payload.situacao,
+        usuario_id: payload.usuario_id,
       })
       .returning();
 
@@ -60,6 +63,7 @@ export default class LancamentoRepository {
     if (payload.valor !== undefined) values.valor = payload.valor;
     if (payload.tipo_lancamento !== undefined) values.tipo_lancamento = payload.tipo_lancamento;
     if (payload.situacao !== undefined) values.situacao = payload.situacao;
+    if (payload.usuario_id !== undefined) values.usuario_id = payload.usuario_id;
 
     const rows = await db
       .update(lancamento)

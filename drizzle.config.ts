@@ -19,9 +19,21 @@ const requiredPort = (name: string): number => {
   return value;
 };
 
+const getSSL = (): boolean | { rejectUnauthorized: boolean } => {
+  const host = process.env.DB_HOST || 'localhost';
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return false;
+  }
+  return { rejectUnauthorized: false };
+};
+
 export default {
   schema: './src/database/schema.ts',
   out: './drizzle',
+  migrations: {
+    schema: 'drizzle',
+    table: '__drizzle_migrations',
+  },
   dialect: 'postgresql',
   dbCredentials: {
     host: requiredEnv('DB_HOST'),
@@ -29,5 +41,6 @@ export default {
     user: requiredEnv('DB_USER'),
     password: requiredEnv('DB_PASSWORD'),
     database: requiredEnv('DB_DATABASE'),
+    ssl: getSSL(),
   },
 } satisfies Config;

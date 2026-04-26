@@ -40,7 +40,12 @@ export default class LancamentoController {
     }
 
     try {
-      const created = await this.lancamentoService.create({ descricao, data_lancamento, valor, tipo_lancamento, situacao });
+      const usuario_id = Number((req as any).user?.id);
+      if (!Number.isInteger(usuario_id) || usuario_id <= 0) {
+        return res.status(401).json({ error: 'Usuário da sessão inválido' });
+      }
+
+      const created = await this.lancamentoService.create({ descricao, data_lancamento, valor, tipo_lancamento, situacao, usuario_id });
       void this.emailService.sendLancamentoNotification('criado', created as Lancamento, email).catch((error) => {
         console.error('Erro ao enviar email de criação de lancamento:', error);
       });
