@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import SessionStore from '../services/SessionStore';
+import SessionStore, { SessionUser } from '../services/SessionStore';
+
+export type AuthenticatedRequest = Request & { user?: SessionUser };
 
 export function getTokenFromReq(req: Request) {
   const auth = req.headers.authorization;
@@ -22,7 +24,8 @@ export function createRequireAuth(sessionStore: SessionStore) {
     const session = sessionStore.get(token);
     if (!session) return res.status(401).json({ error: 'Sessão inválida' });
 
-    (req as any).user = session;
+    const authReq = req as AuthenticatedRequest;
+    authReq.user = session;
     next();
   };
 }

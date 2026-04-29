@@ -1,8 +1,9 @@
-import { describe, it, test, expect, beforeAll, beforeEach, afterEach, afterAll } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { PoolClient } from 'pg';
 import pool from '../db';
 
 describe('DB CRUD', () => {
-    let client: any;
+    let client: PoolClient;
 
     // Para manter DB limpo, fazemos rollback depois de todas alterações
     beforeAll(async () => {

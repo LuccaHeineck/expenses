@@ -37,7 +37,7 @@ describe('PDF Export', () => {
       }
     ];
 
-    pdfService.exportLancamentos(rows, res as any);
+    pdfService.exportLancamentos(rows, res as unknown as import('express').Response);
 
     await new Promise<void>((resolve) => {
       res.on('finish', () => resolve());

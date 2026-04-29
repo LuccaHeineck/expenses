@@ -1,23 +1,25 @@
-import { createHash } from 'crypto';
 import { describe, expect, test, jest, beforeEach } from '@jest/globals';
 import AuthService from '../services/AuthService';
+import SessionStore from '../services/SessionStore';
+import UsuarioRepository from '../repositories/UsuarioRepository';
 
 describe('Auth Service', () => {
   const store = {
     create: jest.fn(),
     get: jest.fn(),
     delete: jest.fn(),
-  } as any;
+  } as unknown as jest.Mocked<SessionStore>;
   const repository = {
     findByLogin: jest.fn(),
-  } as any;
+  } as unknown as jest.Mocked<UsuarioRepository>;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('login retorna null quando usuário não existe', async () => {
-    repository.findByLogin.mockResolvedValue(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    repository.findByLogin.mockResolvedValue(null as any);
     const service = new AuthService(store, repository);
 
     const result = await service.login('usuario-inexistente', '123456');
@@ -44,7 +46,7 @@ describe('Auth Service', () => {
 
   test('login retorna usuário e token quando credenciais são válidas', async () => {
     const senha = '123456';
-    const senhaMd5 = createHash('md5').update(senha).digest('hex');
+    const senhaMd5 = 'e10adc3949ba59abbe56e057f20f883e';
 
     repository.findByLogin.mockResolvedValue({
       id: 5,

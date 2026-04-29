@@ -9,10 +9,155 @@ async function checkAuth() {
     const u = await res.json();
     sessionStorage.setItem("user", JSON.stringify(u));
     return u;
-  } catch (err) {
+  } catch (error) {
+    console.error("Falha ao validar autenticação:", error);
     sessionStorage.removeItem("user");
     window.location.href = "/login";
     return null;
+  }
+}
+
+function bindFilterInput(id) {
+  const element = document.getElementById(id);
+  const rerender = () => {
+    syncFiltersFromUi();
+    renderCurrentTable();
+  };
+  element.addEventListener("input", rerender);
+  element.addEventListener("change", rerender);
+}
+
+function setupFilterInputs() {
+  const filterInputs = [
+    "filter-id",
+    "filter-descricao",
+    "filter-data",
+    "filter-valor",
+    "filter-tipo",
+    "filter-situacao",
+  ];
+  for (const id of filterInputs) {
+    bindFilterInput(id);
+  }
+}
+
+async function handleLogout() {
+  try {
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+  } catch (error) {
+    console.warn("Falha ao encerrar sessão no servidor:", error);
+  }
+  sessionStorage.removeItem("user");
+  window.location.href = "/login";
+}
+
+async function handlePdfExport(button) {
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = "Gerando PDF...";
+
+  try {
+    const res = await fetch("/api/lancamentos/export/pdf", {
+      credentials: "same-origin",
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao exportar PDF");
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "lancamentos.pdf";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error("Falha ao gerar PDF:", error);
+    alert("Não foi possível gerar o PDF.");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalLabel;
+  }
+}
+
+function setupForm(form, emailInput) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const email = String(fd.get("email") || "").trim();
+    localStorage.setItem(notificationEmailKey, email);
+    const body = {
+      descricao: fd.get("descricao"),
+      data_lancamento: fd.get("data_lancamento"),
+      valor: parseFloat(fd.get("valor")),
+      email,
+      tipo_lancamento: fd.get("tipo_lancamento"),
+      situacao: fd.get("situacao"),
+    };
+    await fetch("/api/lancamentos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      credentials: "same-origin",
+    });
+    form.reset();
+    emailInput.value = email;
+    await loadAndRender();
+  });
+}
+
+async function handleSaveAction(target) {
+  const id = target.dataset.id;
+  const row = target.closest("tr");
+  try {
+    await saveInlineEdit(id, row);
+    editingId = null;
+    await loadAndRender();
+  } catch (error) {
+    console.error("Falha ao salvar edição:", error);
+    alert("Não foi possível salvar a edição.");
+  }
+}
+
+async function handleDeleteAction(target) {
+  const id = target.dataset.id;
+  await fetch("/api/lancamentos/" + id, {
+    method: "DELETE",
+    credentials: "same-origin",
+  });
+  await loadAndRender();
+}
+
+async function handleTableClick(e) {
+  const target = e.target;
+  if (target.classList.contains("edit")) {
+    const id = target.dataset.id;
+    const item = findItemById(id);
+    if (!item) return;
+    editingId = item.id;
+    renderCurrentTable();
+    return;
+  }
+
+  if (target.classList.contains("cancel")) {
+    editingId = null;
+    renderCurrentTable();
+    return;
+  }
+
+  if (target.classList.contains("save")) {
+    await handleSaveAction(target);
+    return;
+  }
+
+  if (target.classList.contains("del")) {
+    await handleDeleteAction(target);
   }
 }
 
@@ -61,35 +206,51 @@ function findItemById(id) {
   return currentItems.find((it) => String(it.id) === String(id));
 }
 
-function getFilteredItems() {
-  return currentItems.filter((item) => {
-    const matchesId =
-      !filterState.id || String(item.id).includes(filterState.id);
-    const matchesDescricao =
-      !filterState.descricao ||
-      normalizeText(item.descricao).includes(
-        normalizeText(filterState.descricao),
-      );
-    const matchesData =
-      !filterState.data ||
-      toInputDate(item.data_lancamento) === filterState.data;
-    const matchesValor =
-      !filterState.valor || String(item.valor).includes(filterState.valor);
-    const matchesTipo =
-      !filterState.tipo_lancamento ||
-      item.tipo_lancamento === filterState.tipo_lancamento;
-    const matchesSituacao =
-      !filterState.situacao || item.situacao === filterState.situacao;
+function matchesIdFilter(item) {
+  return !filterState.id || String(item.id).includes(filterState.id);
+}
 
-    return (
-      matchesId &&
-      matchesDescricao &&
-      matchesData &&
-      matchesValor &&
-      matchesTipo &&
-      matchesSituacao
-    );
-  });
+function matchesDescricaoFilter(item) {
+  return (
+    !filterState.descricao ||
+    normalizeText(item.descricao).includes(normalizeText(filterState.descricao))
+  );
+}
+
+function matchesDataFilter(item) {
+  return (
+    !filterState.data ||
+    toInputDate(item.data_lancamento) === filterState.data
+  );
+}
+
+function matchesValorFilter(item) {
+  return !filterState.valor || String(item.valor).includes(filterState.valor);
+}
+
+function matchesTipoFilter(item) {
+  return (
+    !filterState.tipo_lancamento ||
+    item.tipo_lancamento === filterState.tipo_lancamento
+  );
+}
+
+function matchesSituacaoFilter(item) {
+  return !filterState.situacao || item.situacao === filterState.situacao;
+}
+function matchesFilter(item) {
+  return (
+    matchesIdFilter(item) &&
+    matchesDescricaoFilter(item) &&
+    matchesDataFilter(item) &&
+    matchesValorFilter(item) &&
+    matchesTipoFilter(item) &&
+    matchesSituacaoFilter(item)
+  );
+}
+
+function getFilteredItems() {
+  return currentItems.filter(matchesFilter);
 }
 
 function syncFiltersFromUi() {
@@ -129,13 +290,8 @@ async function saveInlineEdit(id, row) {
   }
 }
 
-function renderTable(items) {
-  const tbody = document.querySelector("#table tbody");
-  tbody.innerHTML = "";
-  for (const it of items) {
-    const tr = document.createElement("tr");
-    if (editingId === it.id) {
-      tr.innerHTML = `
+function getEditingRowHtml(it) {
+  return `
         <td data-label="ID">${it.id}</td>
         <td data-label="Descrição"><input name="descricao" value="${it.descricao}" /></td>
         <td data-label="Data"><input name="data_lancamento" type="date" value="${toInputDate(it.data_lancamento)}" /></td>
@@ -157,8 +313,10 @@ function renderTable(items) {
           <button data-id="${it.id}" class="cancel">Cancelar</button>
         </td>
       `;
-    } else {
-      tr.innerHTML = `
+}
+
+function getReadonlyRowHtml(it) {
+  return `
         <td data-label="ID">${it.id}</td>
         <td data-label="Descrição">${it.descricao}</td>
         <td data-label="Data">${it.data_lancamento}</td>
@@ -170,7 +328,14 @@ function renderTable(items) {
           <button data-id="${it.id}" class="del">Excluir</button>
         </td>
       `;
-    }
+}
+
+function renderTable(items) {
+  const tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
+  for (const it of items) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = editingId === it.id ? getEditingRowHtml(it) : getReadonlyRowHtml(it);
     tbody.appendChild(tr);
   }
 }
@@ -179,48 +344,10 @@ async function initApp() {
   const user = await checkAuth();
   if (!user) return;
   document.getElementById("user").textContent = `Usuário: ${user.nome}`;
-
-  document.getElementById("logout").addEventListener("click", async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "same-origin",
-      });
-    } catch (err) {}
-    sessionStorage.removeItem("user");
-    window.location.href = "/login";
-  });
-
+  document.getElementById("logout").addEventListener("click", handleLogout);
   document.getElementById("export-pdf").addEventListener("click", async () => {
     const button = document.getElementById("export-pdf");
-    const originalLabel = button.textContent;
-    button.disabled = true;
-    button.textContent = "Gerando PDF...";
-
-    try {
-      const res = await fetch("/api/lancamentos/export/pdf", {
-        credentials: "same-origin",
-      });
-
-      if (!res.ok) {
-        throw new Error("Erro ao exportar PDF");
-      }
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "lancamentos.pdf";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (err) {
-      alert("Não foi possível gerar o PDF.");
-    } finally {
-      button.disabled = false;
-      button.textContent = originalLabel;
-    }
+    await handlePdfExport(button);
   });
 
   const form = document.getElementById("form");
@@ -230,90 +357,9 @@ async function initApp() {
     emailInput.value = savedEmail;
   }
 
-  const filterInputs = [
-    "filter-id",
-    "filter-descricao",
-    "filter-data",
-    "filter-valor",
-    "filter-tipo",
-    "filter-situacao",
-  ];
-  for (const id of filterInputs) {
-    document.getElementById(id).addEventListener("input", () => {
-      syncFiltersFromUi();
-      renderCurrentTable();
-    });
-    document.getElementById(id).addEventListener("change", () => {
-      syncFiltersFromUi();
-      renderCurrentTable();
-    });
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const fd = new FormData(form);
-    const email = String(fd.get("email") || "").trim();
-    localStorage.setItem(notificationEmailKey, email);
-    const body = {
-      descricao: fd.get("descricao"),
-      data_lancamento: fd.get("data_lancamento"),
-      valor: parseFloat(fd.get("valor")),
-      email,
-      tipo_lancamento: fd.get("tipo_lancamento"),
-      situacao: fd.get("situacao"),
-    };
-    await fetch("/api/lancamentos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      credentials: "same-origin",
-    });
-    form.reset();
-    emailInput.value = email;
-    await loadAndRender();
-  });
-
-  document
-    .querySelector("#table tbody")
-    .addEventListener("click", async (e) => {
-      const target = e.target;
-      if (target.classList.contains("edit")) {
-        const id = target.dataset.id;
-        const item = findItemById(id);
-        if (!item) return;
-        editingId = item.id;
-        renderCurrentTable();
-        return;
-      }
-
-      if (target.classList.contains("cancel")) {
-        editingId = null;
-        renderCurrentTable();
-        return;
-      }
-
-      if (target.classList.contains("save")) {
-        const id = target.dataset.id;
-        const row = target.closest("tr");
-        try {
-          await saveInlineEdit(id, row);
-          editingId = null;
-          await loadAndRender();
-        } catch (err) {
-          alert("Não foi possível salvar a edição.");
-        }
-        return;
-      }
-
-      if (target.classList.contains("del")) {
-        const id = target.dataset.id;
-        await fetch("/api/lancamentos/" + id, {
-          method: "DELETE",
-          credentials: "same-origin",
-        });
-        await loadAndRender();
-      }
-    });
+  setupFilterInputs();
+  setupForm(form, emailInput);
+  document.querySelector("#table tbody").addEventListener("click", handleTableClick);
 
   await loadAndRender();
 }

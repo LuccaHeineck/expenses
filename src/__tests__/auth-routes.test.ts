@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import express from 'express';
 import request from 'supertest';
 import { createAuthRouter } from '../routes/authRoutes';
+import AuthService from '../services/AuthService';
 import SessionStore from '../services/SessionStore';
 
 describe('Auth Routes', () => {
@@ -9,7 +10,7 @@ describe('Auth Routes', () => {
     const authService = {
       login: async () => null,
       logout: () => undefined,
-    } as any;
+    } as unknown as Pick<AuthService, 'login' | 'logout'> as AuthService;
 
     const app = express();
     app.use(express.json());

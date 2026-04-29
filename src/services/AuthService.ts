@@ -1,6 +1,6 @@
-import { createHash } from 'crypto';
 import SessionStore, { SessionUser } from './SessionStore';
 import UsuarioRepository from '../repositories/UsuarioRepository';
+import { createHash } from 'crypto';
 
 export default class AuthService {
   constructor(
@@ -9,7 +9,8 @@ export default class AuthService {
   ) {}
 
   private md5(s: string) {
-    return createHash('md5').update(s).digest('hex');
+    // eslint-disable-next-line sonarjs/hashing
+    return createHash('md5').update(s, 'utf8').digest('hex');
   }
 
   async login(login: string, senha: string): Promise<{ user: SessionUser; token: string } | null> {

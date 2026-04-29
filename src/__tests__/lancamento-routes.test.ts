@@ -2,6 +2,9 @@ import { describe, expect, test, jest } from '@jest/globals';
 import express from 'express';
 import request from 'supertest';
 import SessionStore from '../services/SessionStore';
+import EmailService from '../services/EmailService';
+import LancamentoService from '../services/LancamentoService';
+import PdfExportService from '../services/PdfExportService';
 import { createLancamentoRouter } from '../routes/lancamentoRoutes';
 
 describe('Lancamento Routes', () => {
@@ -11,15 +14,15 @@ describe('Lancamento Routes', () => {
       create: jest.fn(),
       delete: jest.fn(),
       update: jest.fn(),
-    } as any;
+    } as unknown as LancamentoService;
 
     const emailService = {
       sendLancamentoNotification: jest.fn(),
-    } as any;
+    } as unknown as EmailService;
 
     const pdfExportService = {
       exportLancamentos: jest.fn(),
-    } as any;
+    } as unknown as PdfExportService;
 
     const sessionStore = new SessionStore();
     const token = sessionStore.create({ id: 1, nome: 'Usuário', login: 'user', situacao: 'ATIVO' });

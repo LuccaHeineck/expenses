@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getTokenFromReq } from '../middleware/auth';
+import { AuthenticatedRequest, getTokenFromReq } from '../middleware/auth';
 import AuthService from '../services/AuthService';
 
 export default class AuthController {
@@ -22,7 +22,7 @@ export default class AuthController {
   };
 
   me = (req: Request, res: Response) => {
-    res.json((req as any).user);
+    res.json((req as AuthenticatedRequest).user);
   };
 
   logout = (req: Request, res: Response) => {
