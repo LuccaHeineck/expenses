@@ -30,6 +30,7 @@ describe('Email Service', () => {
                 valor: 1500,
                 tipo_lancamento: 'despesa',
                 situacao: 'pago',
+                usuario_id: 1,
             },
             '  teste@example.com  '
         );

@@ -56,13 +56,22 @@ export default class LancamentoController {
       return res.status(400).json({ error: 'Email para notificação é obrigatório' });
     }
 
+    const descricaoStr = String(descricao);
+    const dataLancStr = String(data_lancamento);
+    const valorNum = Number(valor);
+    const tipoStr = String(tipo_lancamento);
+    const situacaoStr = String(situacao);
+    if (!descricaoStr.trim() || !dataLancStr.trim() || !Number.isFinite(valorNum) || !tipoStr.trim() || !situacaoStr.trim()) {
+      return res.status(400).json({ error: 'Campos inválidos' });
+    }
+
     try {
       const usuario_id = this.getUsuarioId(req);
       if (!usuario_id) {
         return res.status(401).json({ error: 'Usuário da sessão inválido' });
       }
 
-      const created = await this.lancamentoService.create({ descricao, data_lancamento, valor, tipo_lancamento, situacao, usuario_id });
+      const created = await this.lancamentoService.create({ descricao: descricaoStr, data_lancamento: dataLancStr, valor: valorNum, tipo_lancamento: tipoStr, situacao: situacaoStr, usuario_id });
       this.emailService.sendLancamentoNotification('criado', created as Lancamento, email).catch((error) => {
         console.error('Erro ao enviar email de criação de lancamento:', error);
       });
@@ -90,13 +99,22 @@ export default class LancamentoController {
   update = async (req: Request, res: Response) => {
     const rawId = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;
-    const { descricao, data_lancamento, valor, tipo_lancamento, situacao, email } = req.body;
+    const { descricao, data_lancamento, valor, tipo_lancamento, situacao, email } = req.body as Record<string, unknown>;
     if (!this.isValidNotificationEmail(email)) {
       return res.status(400).json({ error: 'Email para notificação é obrigatório' });
     }
 
+    const descricaoStr = String(descricao);
+    const dataLancStr = String(data_lancamento);
+    const valorNum = Number(valor);
+    const tipoStr = String(tipo_lancamento);
+    const situacaoStr = String(situacao);
+    if (!descricaoStr.trim() || !dataLancStr.trim() || !Number.isFinite(valorNum) || !tipoStr.trim() || !situacaoStr.trim()) {
+      return res.status(400).json({ error: 'Campos inválidos' });
+    }
+
     try {
-      const updated = await this.lancamentoService.update(id, { descricao, data_lancamento, valor, tipo_lancamento, situacao });
+      const updated = await this.lancamentoService.update(id, { descricao: descricaoStr, data_lancamento: dataLancStr, valor: valorNum, tipo_lancamento: tipoStr, situacao: situacaoStr });
       if (!updated) return res.status(404).json({ error: 'Lancamento não encontrado' });
 
       this.emailService.sendLancamentoNotification('atualizado', updated as Lancamento, email).catch((error) => {
