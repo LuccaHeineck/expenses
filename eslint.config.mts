@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import js from '@eslint/js';
 import globals from 'globals';
 import sonarjs from 'eslint-plugin-sonarjs';
@@ -43,8 +44,8 @@ export default tseslint.config(
       // Evita usar 'any'. Te obriga a tipar as coisas corretamente.
       '@typescript-eslint/no-explicit-any': 'warn',
 
-      // Avisa se você esquecer console.log no código
-      'no-console': 'warn',
+      // Avisa se você esquecer console.log no código (permite console.warn e console.error)
+      'no-console': ["warn", { "allow": ["warn", "error"] }]
     },
   },
 

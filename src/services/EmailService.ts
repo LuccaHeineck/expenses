@@ -30,11 +30,7 @@ export default class EmailService {
 
   async sendEmail(to: string, subject: string, body: string) {
     if (!this.transporter) {
-      console.log('[EMAIL MOCK]');
-      console.log(`To: ${to}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Body:\n${body}`);
-      return;
+      throw new Error('Serviço de e-mail não configurado: Transporter é indefinido.');
     }
 
     await this.transporter.sendMail({

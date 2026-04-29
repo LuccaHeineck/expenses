@@ -28,5 +28,5 @@ app.use('/api', createLancamentoRouter(lancService, emailService, sessionStore, 
 app.use(createPageRouter());
 
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+  console.log(`Servidor rodando em http://localhost:${port}`); // eslint-disable-line no-console
 });
