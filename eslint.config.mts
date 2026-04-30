@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   // Pastas que o ESLint deve ignorar
   {
-    ignores: ['coverage/**', 'dist/**', 'drizzle/**', 'node_modules/**'],
+    ignores: ['coverage/**', 'dist/**', 'migrations/**', 'node_modules/**'],
   },
 
   // Importa configurações padrão de JS, TS e do Sonar

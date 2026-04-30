@@ -29,7 +29,7 @@ const getSSL = (): boolean | { rejectUnauthorized: boolean } => {
 
 export default {
   schema: './src/database/schema.ts',
-  out: './drizzle',
+  out: './migrations',
   migrations: {
     schema: 'drizzle',
     table: '__drizzle_migrations',
