@@ -12,11 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: postgres://user_test:password_test@postgres:5432/db_test
+      DATABASE_URL: postgres://user_test:password_test@localhost:5432/db_test
       SMTP_HOST: localhost
       SMTP_PORT: '1025'
       SMTP_USER: user
       SMTP_PASS: pass
+
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: user_test
+      DB_PASSWORD: password_test
+      DB_DATABASE: db_test
 
     services:
       postgres:
