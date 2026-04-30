@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -39,8 +40,10 @@
     "eslint": "^10.2.1",
     "eslint-plugin-sonarjs": "^4.0.3",
     "globals": "^17.5.0",
+    "husky": "^8.0.0",
     "jest": "^30.3.0",
     "jiti": "^2.6.1",
+    "lint-staged": "^16.4.0",
     "smtp-server": "^3.18.4",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
@@ -48,5 +51,10 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.59.1"
-  }
+  },
+  "lint-staged": {
+  "*.{ts,js}": [
+    "eslint --fix"
+  ]
+}
 }
