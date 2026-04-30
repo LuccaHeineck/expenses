@@ -1,0 +1,60 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgres://user_test:password_test@postgres:5432/db_test
+      SMTP_HOST: localhost
+      SMTP_PORT: '1025'
+      SMTP_USER: user
+      SMTP_PASS: pass
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user_test
+          POSTGRES_PASSWORD: password_test
+          POSTGRES_DB: db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..10}; do
+            pg_isready -h localhost -U user_test && break
+            sleep 2
+          done
+
+      - name: Run Migrations
+        run: npx drizzle-kit push
+
+      - name: Run Tests
+        run: npm test
