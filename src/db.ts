@@ -6,6 +6,14 @@ import * as schema from './database/schema';
 dotenv.config();
 
 const getSSL = (): boolean | { rejectUnauthorized: boolean } => {
+  const sslMode = process.env.DB_SSL;
+  if (sslMode === 'true') {
+    return { rejectUnauthorized: false };
+  }
+  if (sslMode === 'false') {
+    return false;
+  }
+
   const host = process.env.DB_HOST || 'localhost';
   if (host === 'localhost' || host === '127.0.0.1') {
     return false;
