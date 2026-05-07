@@ -31,7 +31,8 @@ function setupFilterInputs() {
   const filterInputs = [
     "filter-id",
     "filter-descricao",
-    "filter-data",
+    "filter-data-inicial",
+    "filter-data-final",
     "filter-valor",
     "filter-tipo",
     "filter-situacao",
@@ -180,7 +181,8 @@ const notificationEmailKey = "notificationEmail";
 const filterState = {
   id: "",
   descricao: "",
-  data: "",
+  dataInicial: "",
+  dataFinal: "",
   valor: "",
   tipo_lancamento: "",
   situacao: "",
@@ -218,10 +220,21 @@ function matchesDescricaoFilter(item) {
 }
 
 function matchesDataFilter(item) {
-  return (
-    !filterState.data ||
-    toInputDate(item.data_lancamento) === filterState.data
-  );
+  const itemData = toInputDate(item.data_lancamento);
+
+  if (!itemData) {
+    return false;
+  }
+
+  if (filterState.dataInicial && itemData < filterState.dataInicial) {
+    return false;
+  }
+
+  if (filterState.dataFinal && itemData > filterState.dataFinal) {
+    return false;
+  }
+
+  return true;
 }
 
 function matchesValorFilter(item) {
@@ -258,7 +271,8 @@ function syncFiltersFromUi() {
   filterState.descricao = document
     .getElementById("filter-descricao")
     .value.trim();
-  filterState.data = document.getElementById("filter-data").value;
+  filterState.dataInicial = document.getElementById("filter-data-inicial").value;
+  filterState.dataFinal = document.getElementById("filter-data-final").value;
   filterState.valor = document.getElementById("filter-valor").value.trim();
   filterState.tipo_lancamento = document.getElementById("filter-tipo").value;
   filterState.situacao = document.getElementById("filter-situacao").value;
