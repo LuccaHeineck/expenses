@@ -1,0 +1,15 @@
+services:
+  db:
+    container_name: expenses-db-prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+
+  app:
+    container_name: expenses-app-prod
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data_prod:

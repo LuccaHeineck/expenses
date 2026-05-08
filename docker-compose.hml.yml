@@ -1,0 +1,15 @@
+services:
+  db:
+    container_name: expenses-db-hml
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_hml:/var/lib/postgresql/data
+
+  app:
+    container_name: expenses-app-hml
+    ports:
+      - "3001:3000"
+
+volumes:
+  postgres_data_hml:
