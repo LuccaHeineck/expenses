@@ -20,28 +20,29 @@ jobs:
       - name: Add Known Hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to homolog
         run: |
           echo "Iniciando deploy no host ${{ secrets.VM_HOST }}..."
 
-          ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            set -e
+          ssh -o StrictHostKeyChecking=yes \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+              set -e
 
-            echo "Diretório atual: $(pwd)"
+              echo "Diretório atual: $(pwd)"
 
-            cd /srv/expenses/homolog
+              cd /srv/expenses/homolog
 
-            echo "Puxando alterações do branch homolog..."
-            git pull origin homolog
+              echo "Puxando alterações do branch homolog..."
+              git pull origin homolog
 
-            echo "Subindo containers com Docker Compose..."
+              echo "Subindo containers com Docker Compose..."
 
-            docker compose \
-              -f docker-compose.yml \
-              -f docker-compose.hml.yml \
-              up -d --build
+              docker compose \
+                -f docker-compose.yml \
+                -f docker-compose.hml.yml \
+                up -d --build
 
-            echo "Deploy finalizado com sucesso!"
-          EOF
+              echo "Deploy finalizado com sucesso!"
+            EOF
