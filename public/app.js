@@ -177,7 +177,8 @@ async function fetchLancamentos() {
 
 let currentItems = [];
 let editingId = null;
-const notificationEmailKey = "notificationEmail";
+const _env = (typeof window !== 'undefined' && window.NODE_ENV) ? window.NODE_ENV : 'development';
+const notificationEmailKey = _env + ':notificationEmail';
 const filterState = {
   id: "",
   descricao: "",
@@ -384,5 +385,35 @@ async function loadAndRender() {
 }
 
 if (location.pathname === "/app") {
+  // set environment badges on the page
+  const env = String(_env || '').toLowerCase();
+  const mapEnv = (e) => {
+    if (!e) return '';
+    if (e === 'production' || e === 'producao' || e.startsWith('prod')) return 'Produção';
+    if (e === 'homolog' || e.startsWith('homo')) return 'Homologação';
+    return e.charAt(0).toUpperCase() + e.slice(1);
+  };
+
+  const badgeText = mapEnv(env);
+  const titleBadge = document.getElementById('env-badge-title');
+  const subtitleBadge = document.getElementById('env-badge-subtitle');
+
+  const isProd = env === 'production' || env === 'producao' || env.startsWith('prod');
+  const isHomolog = env === 'homolog' || env.startsWith('homo');
+
+  if (titleBadge) {
+    titleBadge.textContent = badgeText;
+    titleBadge.classList.remove('prod', 'homolog');
+    if (isProd) titleBadge.classList.add('prod');
+    if (isHomolog) titleBadge.classList.add('homolog');
+  }
+
+  if (subtitleBadge) {
+    subtitleBadge.textContent = badgeText;
+    subtitleBadge.classList.remove('prod', 'homolog');
+    if (isProd) subtitleBadge.classList.add('prod');
+    if (isHomolog) subtitleBadge.classList.add('homolog');
+  }
+
   initApp();
 }
