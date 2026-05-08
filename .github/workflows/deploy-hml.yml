@@ -12,28 +12,31 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup SSH
+        shell: bash
         run: |
-          install -m 700 -d ~/.ssh
+          mkdir -p "$HOME/.ssh"
 
-          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.VM_SSH_KEY }}" > "$HOME/.ssh/id_ed25519"
 
-          chmod 600 ~/.ssh/id_ed25519
+          chmod 600 "$HOME/.ssh/id_ed25519"
 
-          ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} >> "$HOME/.ssh/known_hosts"
 
       - name: Test SSH Connection
+        shell: bash
         run: |
           ssh -vvv \
-            -i ~/.ssh/id_ed25519 \
+            -i "$HOME/.ssh/id_ed25519" \
             -o StrictHostKeyChecking=yes \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} exit
 
       - name: Deploy to homolog
+        shell: bash
         run: |
           echo "Iniciando deploy no host ${{ secrets.VM_HOST }}..."
 
           ssh \
-            -i ~/.ssh/id_ed25519 \
+            -i "$HOME/.ssh/id_ed25519" \
             -o StrictHostKeyChecking=yes \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
               set -e
