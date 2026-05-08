@@ -11,21 +11,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Test TCP connection
-        run: |
-          nc -vz ${{ secrets.VM_HOST }} 22
-
       - name: Deploy to homolog
         uses: appleboy/ssh-action@v1
 
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          port: 22
-          debug: true
-          timeout: 30s
-          command_timeout: 10m
+          key: ${{ secrets.VM_SSH_KEY }}
 
           script: |
             set -e
