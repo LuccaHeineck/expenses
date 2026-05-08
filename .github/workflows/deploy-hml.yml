@@ -1,0 +1,37 @@
+name: Deploy Homolog
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to homolog
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          password: ${{ secrets.VM_PASSWORD }}
+
+          script: |
+            set -e
+
+            cd /srv/expenses/homolog
+
+            echo "Current branch:"
+            git branch
+
+            echo "Pulling latest homolog..."
+            git pull origin homolog
+
+            echo "Rebuilding containers..."
+
+            docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
+
+            echo "Deploy finished!"
