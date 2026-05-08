@@ -1,14 +1,11 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: expenses-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-expenses}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-expenses}
       POSTGRES_DB: ${DB_DATABASE:-expenses}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -21,7 +18,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: expenses-app
     restart: unless-stopped
     environment:
       PORT: 3000
@@ -31,8 +27,6 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-expenses}
       DB_DATABASE: ${DB_DATABASE:-expenses}
       DB_SSL: false
-    ports:
-      - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
