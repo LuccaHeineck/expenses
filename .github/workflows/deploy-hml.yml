@@ -11,27 +11,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Test TCP connection
+        run: |
+          nc -vz ${{ secrets.VM_HOST }} 22
+
       - name: Deploy to homolog
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1
 
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           password: ${{ secrets.VM_PASSWORD }}
+          port: 22
+          debug: true
+          timeout: 30s
+          command_timeout: 10m
 
           script: |
             set -e
 
             cd /srv/expenses/homolog
 
-            echo "Current branch:"
-            git branch
-
-            echo "Pulling latest homolog..."
             git pull origin homolog
 
-            echo "Rebuilding containers..."
-
             docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
-
-            echo "Deploy finished!"
