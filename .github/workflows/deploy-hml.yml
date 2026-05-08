@@ -14,20 +14,22 @@ jobs:
       - name: Setup SSH
         shell: bash
         run: |
-          mkdir -p "$HOME/.ssh"
+          mkdir -p /tmp/ssh
 
-          echo "${{ secrets.VM_SSH_KEY }}" > "$HOME/.ssh/id_ed25519"
+          echo "${{ secrets.VM_SSH_KEY }}" > /tmp/ssh/id_ed25519
 
-          chmod 600 "$HOME/.ssh/id_ed25519"
+          chmod 600 /tmp/ssh/id_ed25519
 
-          ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} >> "$HOME/.ssh/known_hosts"
+          ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} > /tmp/ssh/known_hosts
 
       - name: Test SSH Connection
         shell: bash
         run: |
-          ssh -vvv \
-            -i "$HOME/.ssh/id_ed25519" \
+          ssh \
+            -i /tmp/ssh/id_ed25519 \
+            -o UserKnownHostsFile=/tmp/ssh/known_hosts \
             -o StrictHostKeyChecking=yes \
+            -vvv \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} exit
 
       - name: Deploy to homolog
@@ -36,7 +38,8 @@ jobs:
           echo "Iniciando deploy no host ${{ secrets.VM_HOST }}..."
 
           ssh \
-            -i "$HOME/.ssh/id_ed25519" \
+            -i /tmp/ssh/id_ed25519 \
+            -o UserKnownHostsFile=/tmp/ssh/known_hosts \
             -o StrictHostKeyChecking=yes \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
               set -e
