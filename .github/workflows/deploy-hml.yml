@@ -11,28 +11,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-
-        with:
-          ssh-private-key: ${{ secrets.VM_SSH_KEY }}
-
-      - name: Add Known Hosts
+      - name: Setup SSH
         run: |
-          mkdir -p ~/.ssh
+          install -m 700 -d ~/.ssh
+
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
+
+          chmod 600 ~/.ssh/id_ed25519
+
           ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Test SSH Connection
         run: |
           ssh -vvv \
-            -o StrictHostKeyChecking=no \
+            -i ~/.ssh/id_ed25519 \
+            -o StrictHostKeyChecking=yes \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} exit
 
       - name: Deploy to homolog
         run: |
           echo "Iniciando deploy no host ${{ secrets.VM_HOST }}..."
 
-          ssh -o StrictHostKeyChecking=yes \
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -o StrictHostKeyChecking=yes \
             ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
               set -e
 
