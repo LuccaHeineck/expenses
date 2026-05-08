@@ -34,10 +34,9 @@
     }
 
     .env-badge.small {
-      padding: 4px 8px;
-      font-size: 0.8rem;
+      padding: 4px 10px;
+      font-size: 0.82rem;
       vertical-align: middle;
-      margin-left: 8px;
     }
 
     .env-badge.prod {
@@ -114,10 +113,27 @@
     .title-group {
       position: relative;
       z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title-row h1 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .subtitle {
-      margin: 4px 0 0;
+      margin: 0;
       color: var(--muted);
       font-size: 0.9rem;
     }
@@ -467,8 +483,11 @@
   <main>
     <section class="header">
       <div class="title-group">
-        <h1>Controle Financeiro <span id="env-badge-title" class="env-badge small"></span></h1>
-        <p class="subtitle"><span id="env-badge-subtitle" class="env-badge"></span></p>
+        <div class="title-row">
+          <h1>Controle Financeiro</h1>
+          <span id="env-badge-title" class="env-badge small"></span>
+        </div>
+        <p class="subtitle">Cadastre, edite e acompanhe suas receitas e despesas</p>
       </div>
       <div id="user"></div>
       <div class="header-actions">
