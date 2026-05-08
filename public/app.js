@@ -177,7 +177,8 @@ async function fetchLancamentos() {
 
 let currentItems = [];
 let editingId = null;
-const notificationEmailKey = "notificationEmail";
+const _env = (typeof window !== 'undefined' && window.NODE_ENV) ? window.NODE_ENV : 'development';
+const notificationEmailKey = _env + ':notificationEmail';
 const filterState = {
   id: "",
   descricao: "",

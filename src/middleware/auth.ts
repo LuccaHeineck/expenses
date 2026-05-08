@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import SessionStore, { SessionUser } from '../services/SessionStore';
+import { COOKIE_NAME } from '../config';
 
 export type AuthenticatedRequest = Request & { user?: SessionUser };
 
@@ -10,7 +11,7 @@ export function getTokenFromReq(req: Request) {
   const cookie = req.headers.cookie;
   if (!cookie) return null;
 
-  const match = cookie.split(/; */).find((c) => c.startsWith('sid='));
+  const match = cookie.split(/; */).find((c) => c.startsWith(`${COOKIE_NAME}=`));
   if (!match) return null;
 
   return match.split('=')[1];

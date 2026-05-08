@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthenticatedRequest, getTokenFromReq } from '../middleware/auth';
 import AuthService from '../services/AuthService';
+import { COOKIE_NAME } from '../config';
 
 export default class AuthController {
   constructor(private authService: AuthService) {}
@@ -13,7 +14,7 @@ export default class AuthController {
       const result = await this.authService.login(login, senha);
       if (!result) return res.status(401).json({ error: 'Credenciais inválidas' });
 
-      res.setHeader('Set-Cookie', `sid=${result.token}; HttpOnly; Path=/; SameSite=Lax`);
+      res.setHeader('Set-Cookie', `${COOKIE_NAME}=${result.token}; HttpOnly; Path=/; SameSite=Lax`);
       res.json(result.user);
     } catch (error) {
       console.error('Erro no login:', error);
@@ -29,7 +30,7 @@ export default class AuthController {
     const token = getTokenFromReq(req);
     if (token) this.authService.logout(token);
 
-    res.setHeader('Set-Cookie', 'sid=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax');
+    res.setHeader('Set-Cookie', `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`);
     res.status(204).send();
   };
 }
