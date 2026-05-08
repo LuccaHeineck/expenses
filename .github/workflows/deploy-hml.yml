@@ -22,6 +22,12 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Test SSH Connection
+        run: |
+          ssh -vvv \
+            -o StrictHostKeyChecking=no \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} exit
+
       - name: Deploy to homolog
         run: |
           echo "Iniciando deploy no host ${{ secrets.VM_HOST }}..."
