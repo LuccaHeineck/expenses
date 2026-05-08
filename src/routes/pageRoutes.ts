@@ -18,7 +18,7 @@ export function createPageRouter() {
       const out = html.replace('</head>', `${envScript}</head>`);
       res.type('html').send(out);
     } catch (err: unknown) {
-      console.error('Failed to inject NODE_ENV into app.html, serving original file:', err); // eslint-disable-line no-console
+      console.error('Failed to inject NODE_ENV into app.html, serving original file:', err);
       res.sendFile(filePath);
     }
   });
