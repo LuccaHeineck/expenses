@@ -11,19 +11,52 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup SSH
+        shell: bash
+        run: |
+          mkdir -p /tmp/ssh
+
+          echo "${{ secrets.VM_SSH_KEY }}" > /tmp/ssh/id_ed25519
+
+          chmod 600 /tmp/ssh/id_ed25519
+
+          ssh-keyscan -t ed25519 -H ${{ secrets.VM_HOST }} > /tmp/ssh/known_hosts
+
+      - name: Test SSH Connection
+        shell: bash
+        run: |
+          ssh \
+            -i /tmp/ssh/id_ed25519 \
+            -o UserKnownHostsFile=/tmp/ssh/known_hosts \
+            -o StrictHostKeyChecking=yes \
+            -vvv \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} exit
+
       - name: Deploy to homolog
-        uses: appleboy/ssh-action@v1
+        shell: bash
+        run: |
+          echo "Iniciando deploy no host ${{ secrets.VM_HOST }}..."
 
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          ssh \
+            -i /tmp/ssh/id_ed25519 \
+            -o UserKnownHostsFile=/tmp/ssh/known_hosts \
+            -o StrictHostKeyChecking=yes \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+              set -e
 
-          script: |
-            set -e
+              echo "Diretório atual: $(pwd)"
 
-            cd /srv/expenses/homolog
+              cd /srv/expenses/homolog
 
-            git pull origin homolog
+              echo "Puxando alterações do branch homolog..."
+              git pull origin homolog
 
-            docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
+              echo "Subindo containers com Docker Compose..."
+
+              docker compose \
+                -f docker-compose.yml \
+                -f docker-compose.hml.yml \
+                up -d --build
+
+              echo "Deploy finalizado com sucesso!"
+            EOF
