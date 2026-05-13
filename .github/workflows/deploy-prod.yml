@@ -1,0 +1,52 @@
+name: Deploy Produção
+
+on:
+  workflow_dispatch:
+
+jobs:
+  merge-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar bot Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge homolog na main
+        run: |
+          git checkout main
+          git pull origin main
+          git pull origin homolog
+          git merge origin/homolog --no-ff -m "Deploy de homolog em prod"
+          git push origin main
+
+      - name: Deploy Produção
+        uses: appleboy/ssh-action@v1.2.5
+
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+
+          script: |
+            set -e
+
+            cd /srv/expenses/prod
+
+            git pull origin homolog
+
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+      - name: Notificar sucesso
+        if: success()
+        run: echo "Merge homolog -> main realizado e Deploy produção feito com sucesso"
+ 
+      - name: Notificar falha
+        if: failure()
+        run: echo "Merge ou Deploy falhou"
