@@ -2,9 +2,9 @@ name: Unit Tests
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "homolog"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "homolog"]
 
 jobs:
   test:
@@ -14,7 +14,7 @@ jobs:
     env:
       DATABASE_URL: postgres://user_test:password_test@localhost:5432/db_test
       SMTP_HOST: localhost
-      SMTP_PORT: '1025'
+      SMTP_PORT: "1025"
       SMTP_USER: user
       SMTP_PASS: pass
 
