@@ -1,7 +1,7 @@
 name: Setup do ambiente
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   setup-infra:
@@ -35,8 +35,10 @@ jobs:
             sudo chown -R $USER:$USER /srv/expenses/homolog
             sudo chown -R $USER:$USER /srv/expenses/prod
 
-            echo "Setup finalizado!"
+            echo "Adicionando usuário ao grupo docker..."
+            sudo usermod -aG docker $USER
 
+            echo "Setup finalizado!"
 
       - name: Criar .env para homolog e prod
         uses: appleboy/ssh-action@v1.2.5
@@ -45,7 +47,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           password: ${{ secrets.VM_PASSWORD }}
           use_insecure_cipher: true
- 
+
           script: |
             # Homolog
             cat > /srv/expenses/homolog/.env << 'EOF'
@@ -81,7 +83,17 @@ jobs:
             EOF
             echo ".env criado para prod"
 
- 
+      - name: Clonar repositórios
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          password: ${{ secrets.VM_PASSWORD }}
+          use_insecure_cipher: true
+          script: |
+            echo "Clonando branch homolog..."
+            git clone -b homolog https://github.com/LuccaHeineck/expenses /srv/expenses/homolog
 
-            
-        
+            echo "Clonando branch main..."
+            git clone -b main https://github.com/LuccaHeineck/expenses /srv/expenses/prod
+            echo "Clone finalizado!"

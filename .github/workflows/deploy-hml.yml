@@ -1,29 +1,22 @@
 name: Deploy Homolog
-
 on:
   workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Deploy to homolog
-        uses: appleboy/ssh-action@v1
-
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-
-          script: |
+        env:
+          SSHPASS: ${{ secrets.VM_PASSWORD }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "
             set -e
-
             cd /srv/expenses/homolog
-
             git pull origin homolog
-
             docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
+          "
