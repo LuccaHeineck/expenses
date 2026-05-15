@@ -1,0 +1,21 @@
+name: SSH Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Test SSH connection with verbose logs
+        run: |
+          sshpass -p "${{ secrets.VM_PASSWORD }}" ssh -vvv \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=20 \
+            "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" \
+            "echo SSH conectado com sucesso"
