@@ -5,37 +5,32 @@ on:
 
 jobs:
   setup-infra:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Acessar VM e instalar dependências
-        uses: appleboy/ssh-action@v1.2.5
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          use_insecure_cipher: true
+        run: |
+          set -x
 
-          script: |
-            echo "Atualizando lista de pacotes do sistema..."
-            sudo apt-get update -y
+          echo "Atualizando lista de pacotes do sistema..."
+          sudo apt-get update -y
 
-            echo "Instalando Docker Engine..."
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
+          echo "Instalando Docker Engine..."
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
 
-            echo "Instalando Docker Compose..."
-            sudo apt-get install docker-compose-plugin -y
+          echo "Instalando Docker Compose..."
+          sudo apt-get install docker-compose-plugin -y
 
-            echo "Criando pastas para ambientes homolog e prod..."
-            sudo mkdir -p /srv/expenses/homolog
-            sudo mkdir -p /srv/expenses/prod
+          echo "Criando pastas para ambientes homolog e prod..."
+          sudo mkdir -p /srv/expenses/homolog
+          sudo mkdir -p /srv/expenses/prod
 
-            echo "Alterando permissões das pastas dos ambientes..."
-            sudo chown -R $USER:$USER /srv/expenses/homolog
-            sudo chown -R $USER:$USER /srv/expenses/prod
+          echo "Alterando permissões das pastas dos ambientes..."
+          sudo chown -R $USER:$USER /srv/expenses/homolog
+          sudo chown -R $USER:$USER /srv/expenses/prod
 
-            echo "Setup finalizado!"
+          echo "Setup finalizado!"
 
             
         
