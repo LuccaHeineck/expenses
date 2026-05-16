@@ -10,6 +10,8 @@ services:
     container_name: expenses-app-hml
     ports:
       - "3001:3000"
+    environment:
+      NODE_ENV: homolog
 
 volumes:
   postgres_data_hml:

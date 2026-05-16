@@ -12,7 +12,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "deploy:hml": "act workflow_dispatch -j deploy --secret-file .secrets --container-options \"--user root\""
   },
   "keywords": [],
   "author": "",
@@ -53,8 +54,8 @@
     "typescript-eslint": "^8.59.1"
   },
   "lint-staged": {
-  "*.{ts,js}": [
-    "eslint --fix"
-  ]
-}
+    "*.{ts,js}": [
+      "eslint --fix"
+    ]
+  }
 }

@@ -4,26 +4,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  code-quality:
+    uses: ./.github/workflows/eslint.yml
+
+  # testes:
+  
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Deploy Homolog
+        run: |
+          set -e
 
-      - name: Deploy to homolog
-        uses: appleboy/ssh-action@v1
+          cd /srv/expenses/homolog
 
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          git pull origin homolog
 
-          script: |
-            set -e
-
-            cd /srv/expenses/homolog
-
-            git pull origin homolog
-
-            docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
+          docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
