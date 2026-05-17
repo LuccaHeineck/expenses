@@ -1,0 +1,51 @@
+name: Reset VM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  purge-server:
+    name: Limpa Docker, Arquivos and Runner
+    runs-on: self-hosted
+
+    steps:
+      - name: Remover pastas do projeto
+        run: |
+          echo "Removendo pastas em /srv/expenses"
+          sudo rm -Rf /srv/expenses
+
+      - name: Desinstalar completamente Docker
+        run: |
+          echo "Desinstalando Docker e dependências..."
+          
+          # 1. Para os serviços do Docker para liberar os arquivos em memória
+          sudo systemctl stop docker.service 2>/dev/null || true
+          sudo systemctl stop docker.socket 2>/dev/null || true
+          sudo systemctl stop containerd 2>/dev/null || true
+
+          # 2. Purga os pacotes oficiais do Docker
+          sudo apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras 2>/dev/null || true
+
+          # 3. Remove brutalmente todos os dados residuais (containers, imagens e volumes) do disco
+          sudo rm -rf /var/lib/docker
+          sudo rm -rf /var/lib/containerd
+          sudo rm -rf /etc/docker
+          
+          # 4. Remove o grupo docker se existir
+          sudo groupdel docker 2>/dev/null || true
+
+          # 5. Limpa o repositório e chaves do APT do Docker
+          sudo rm -f /etc/apt/sources.list.d/docker.list
+          sudo rm -f /etc/apt/keyrings/docker.asc
+
+          # 6. Limpeza final de pacotes órfãos do sistema
+          sudo apt-get autoremove -y
+          sudo apt-get autoclean
+
+      - name: Remover self-hosted Runner
+        run: |
+          echo "Desinstalando o serviço do Runner..."
+          # Remove o serviço do systemd local do Linux
+          sudo ./svc.sh uninstall || true
+          
+          echo "O runner foi desativado com sucesso. Ele aparecerá como Offline no GitHub."
