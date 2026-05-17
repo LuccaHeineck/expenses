@@ -4,14 +4,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  code-quality:
+    uses: ./.github/workflows/eslint.yml
+
+  # testes:
+    
   merge-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    needs: [code-quality]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configurar bot Git
         run: |
@@ -22,26 +29,21 @@ jobs:
         run: |
           git checkout main
           git pull origin main
-          git pull origin homolog
           git merge origin/homolog --no-ff -m "Deploy de homolog em prod"
           git push origin main
 
       - name: Deploy Produção
-        uses: appleboy/ssh-action@v1.2.5
+        run: |
+          set -e
 
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          cd /srv/expenses/prod
 
-          script: |
-            set -e
+          git fetch origin
+          git checkout main
+          git pull origin main
 
-            cd /srv/expenses/prod
-
-            git pull origin homolog
-
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+          # Sobe os containers de produção
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
       - name: Notificar sucesso
         if: success()
