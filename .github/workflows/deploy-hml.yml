@@ -11,7 +11,7 @@ jobs:
   
   deploy:
     runs-on: self-hosted
-
+    needs: [code-quality]
     steps:
       - name: Deploy Homolog
         run: |
