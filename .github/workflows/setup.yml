@@ -30,10 +30,6 @@ jobs:
           sudo chown -R $USER:$USER /srv/expenses/homolog
           sudo chown -R $USER:$USER /srv/expenses/prod
 
-          echo "Adicionando usuário ao grupo docker..."
-          sudo usermod -aG docker $USER
-
-          echo "Setup finalizado!"
           echo "Setup finalizado!"
 
       - name: Criar .env para homolog e prod
