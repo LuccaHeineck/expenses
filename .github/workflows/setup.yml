@@ -22,9 +22,8 @@ jobs:
           echo "Instalando Docker Compose..."
           sudo apt-get install docker-compose-plugin -y
 
-          echo "Criando pastas para ambientes homolog e prod..."
-          sudo mkdir -p /srv/expenses/homolog
-          sudo mkdir -p /srv/expenses/prod
+          echo "Criando pasta para ambientes homolog e prod..."
+          sudo mkdir -p /srv/expenses
 
           echo "Alterando permissões das pastas dos ambientes..."
           sudo chown -R $USER:$USER /srv/expenses/homolog
@@ -32,6 +31,15 @@ jobs:
 
           echo "Setup finalizado!"
 
+      - name: Clonar repositórios
+        run: |
+          echo "Clonando branch homolog..."
+          git clone -b homolog https://github.com/LuccaHeineck/expenses /srv/expenses/homolog
+
+          echo "Clonando branch main..."
+          git clone -b main https://github.com/LuccaHeineck/expenses /srv/expenses/prod
+          echo "Clone finalizado!"
+          
       - name: Criar .env para homolog e prod
         run: |
           # Homolog
@@ -68,11 +76,3 @@ jobs:
           EOF
           echo ".env criado para prod"
 
-      - name: Clonar repositórios
-        run: |
-          echo "Clonando branch homolog..."
-          git clone -b homolog https://github.com/LuccaHeineck/expenses /srv/expenses/homolog
-
-          echo "Clonando branch main..."
-          git clone -b main https://github.com/LuccaHeineck/expenses /srv/expenses/prod
-          echo "Clone finalizado!"
