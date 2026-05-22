@@ -47,5 +47,6 @@ jobs:
           echo "Desinstalando o serviço do Runner..."
           # Remove o serviço do systemd local do Linux
           sudo ./svc.sh uninstall || true
+          sudo rm -Rf actions-runner
           
           echo "O runner foi desativado com sucesso. Ele aparecerá como Offline no GitHub."
