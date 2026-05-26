@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Carrega variáveis do .env
+# Carrega variáveis do .env 
 set -a
 source .env
 set +a
