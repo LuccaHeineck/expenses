@@ -9,11 +9,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Remover pastas do projeto
-        run: |
-          echo "Removendo pastas em /srv/expenses"
-          sudo rm -Rf /srv/expenses
-
       - name: Desinstalar completamente Docker
         run: |
           echo "Desinstalando Docker e dependências..."
@@ -41,6 +36,11 @@ jobs:
           # 6. Limpeza final de pacotes órfãos do sistema
           sudo apt-get autoremove -y
           sudo apt-get autoclean
+
+      - name: Remover pastas do projeto
+        run: |
+          echo "Removendo pastas em /srv/expenses"
+          sudo rm -Rf /srv/expenses
 
       - name: Remover self-hosted Runner
         run: |

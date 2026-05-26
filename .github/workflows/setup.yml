@@ -8,7 +8,7 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Acessar VM e instalar dependências
+      - name: Acessar VM, instalar dependências e configurar ambiente
         run: |
           set -x
 
@@ -22,74 +22,20 @@ jobs:
           echo "Instalando Docker Compose..."
           sudo apt-get install docker-compose-plugin -y
 
-          echo "Criando pastas para ambientes homolog e prod..."
+          echo "Adicionando o usuário ao grupo docker..."
+          sudo gpasswd -a $USER docker
+
+          echo "Alterando as permissões do socket do docker..."
+          sudo chown root:$(id -gn) /var/run/docker.sock
+
+          echo "Criando pasta para ambientes homolog e prod..."
           sudo mkdir -p /srv/expenses/homolog
-          sudo mkdir -p /srv/expenses/prod
+          sudo mkdir -p /srv/expenses/prod  
 
           echo "Alterando permissões das pastas dos ambientes..."
           sudo chown -R $USER:$USER /srv/expenses/homolog
           sudo chown -R $USER:$USER /srv/expenses/prod
 
-          echo "Adicionando usuário ao grupo docker..."
-          sudo usermod -aG docker $USER
-
-          echo "Setup finalizado!"
           echo "Setup finalizado!"
 
-      - name: Criar .env para homolog e prod
-        uses: appleboy/ssh-action@v1.2.5
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          use_insecure_cipher: true
 
-          script: |
-            # Homolog
-            cat > /srv/expenses/homolog/.env << 'EOF'
-            PORT=${{ secrets.HOMOLOG_PORT }}
-            DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-            DB_PORT=${{ secrets.HOMOLOG_DB_PORT }}
-            DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-            DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
-            DB_DATABASE=${{ secrets.HOMOLOG_DB_DATABASE }}
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_USER=${{ secrets.SMTP_USER }}
-            SMTP_PASS=${{ secrets.SMTP_PASS }}
-            DB_SSL=false
-            NODE_ENV=homolog
-            EOF
-            echo ".env criado para homolog"
-
-            # Prod
-            cat > /srv/expenses/prod/.env << 'EOF'
-            PORT=${{ secrets.PROD_PORT }}
-            DB_HOST=${{ secrets.PROD_DB_HOST }}
-            DB_PORT=${{ secrets.PROD_DB_PORT }}
-            DB_USER=${{ secrets.PROD_DB_USER }}
-            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
-            DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_USER=${{ secrets.SMTP_USER }}
-            SMTP_PASS=${{ secrets.SMTP_PASS }}
-            DB_SSL=true
-            NODE_ENV=prod
-            EOF
-            echo ".env criado para prod"
-
-      - name: Clonar repositórios
-        uses: appleboy/ssh-action@v1.2.5
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          use_insecure_cipher: true
-          script: |
-            echo "Clonando branch homolog..."
-            git clone -b homolog https://github.com/LuccaHeineck/expenses /srv/expenses/homolog
-
-            echo "Clonando branch main..."
-            git clone -b main https://github.com/LuccaHeineck/expenses /srv/expenses/prod
-            echo "Clone finalizado!"

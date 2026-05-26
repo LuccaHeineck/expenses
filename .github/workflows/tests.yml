@@ -5,6 +5,8 @@ on:
     branches: ["main", "homolog"]
   pull_request:
     branches: ["main", "homolog"]
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   test:

@@ -3,22 +3,74 @@ name: Deploy Homolog
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   code-quality:
     uses: ./.github/workflows/eslint.yml
 
-  # testes:
-  
-  deploy:
-    runs-on: self-hosted
+  unit-tests:
     needs: [code-quality]
+    uses: ./.github/workflows/tests.yml
+  
+  build-and-push:
+    name: Buildar e enviar imagem para o GHCR
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
     steps:
-      - name: Deploy Homolog
-        run: |
-          set -e
+      - uses: actions/checkout@v4
 
-          cd /srv/expenses/homolog
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-          git pull origin homolog
+      - name: Build e push da imagem de Homolog
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/expenses:homolog
 
-          docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --build
+  # Faz o pull da imagem mais recente e reinicia os containers no ambiente de homologação
+  deploy:
+      name: Atualizar Homolog
+      runs-on: self-hosted
+      needs: [build-and-push]
+      steps:
+        - name: Baixar arquivos do repositório na VM
+          uses: actions/checkout@v4
+
+        - name: Mover arquivos para a pasta de Homolog e criar .env
+          run: |
+            cp docker-compose.yml docker-compose.hml.yml /srv/expenses/homolog/
+            
+            cd /srv/expenses/homolog
+            cat > .env << 'EOF'
+            IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/expenses:homolog
+            PORT=${{ secrets.HOMOLOG_PORT }}
+            DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
+            DB_PORT=${{ secrets.HOMOLOG_DB_PORT }}
+            DB_USER=${{ secrets.HOMOLOG_DB_USER }}
+            DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
+            DB_DATABASE=${{ secrets.HOMOLOG_DB_DATABASE }}
+            DB_SSL=false
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USER=${{ secrets.SMTP_USER }}
+            SMTP_PASS=${{ secrets.SMTP_PASS }}
+            NODE_ENV=homolog
+            EOF
+            echo ".env atualizado para homolog"
+
+        - name: Docker Compose Pull & Up
+          run: |
+            cd /srv/expenses/homolog
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
+            docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --remove-orphans
