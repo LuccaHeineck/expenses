@@ -35,7 +35,7 @@ jobs:
   
   build-and-push:
     name: Buildar e enviar imagem para o GHCR
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [unit-tests]
     steps:
       - uses: actions/checkout@v4
@@ -49,12 +49,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Define o nome do repositório em lowercase
+        id: string
+        run: |
+          echo "repo_lower=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_OUTPUT
+
       - name: Build e push da imagem de Produção
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/expenses:homolog
+          tags: ghcr.io/${{ steps.string.outputs.repo_lower }}:latest
 
   # Faz o pull da imagem mais recente e reinicia os containers no ambiente de homologação
   deploy:
@@ -64,14 +69,20 @@ jobs:
       steps:
         - name: Baixar arquivos do repositório na VM
           uses: actions/checkout@v4
+          with:
+            ref: main
 
         - name: Mover arquivos para a pasta de Produção e criar .env
           run: |
-            cp docker-compose.yml docker-compose.prod.yml /srv/expenses/producao/
+            cp docker-compose.yml docker-compose.prod.yml /srv/expenses/prod/
             
-            cd /srv/expenses/producao
-            cat > .env << 'EOF'
-            IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/expenses:prod
+            cd /srv/expenses/prod
+            
+            REPO_RAW="${{ github.repository }}"
+            REPO_LOWER=${REPO_RAW,,}
+            
+            cat > .env << EOF
+            IMAGE_TAG=ghcr.io/${REPO_LOWER}:latest
             PORT=${{ secrets.PROD_PORT }}
             DB_HOST=${{ secrets.PROD_DB_HOST }}
             DB_PORT=${{ secrets.PROD_DB_PORT }}
