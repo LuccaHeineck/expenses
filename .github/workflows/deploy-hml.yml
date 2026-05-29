@@ -55,8 +55,13 @@ jobs:
             cp docker-compose.yml docker-compose.hml.yml /srv/expenses/homolog/
             
             cd /srv/expenses/homolog
-            cat > .env << 'EOF'
-            IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/expenses:homolog
+
+            # Repo convertido para lowercase para GHCR
+            REPO_RAW="${{ github.repository }}"            
+            REPO_LOWER=${REPO_RAW,,}
+            
+            cat > .env << EOF
+            IMAGE_TAG=ghcr.io/${REPO_LOWER}:homolog
             PORT=${{ secrets.HOMOLOG_PORT }}
             DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
             DB_PORT=${{ secrets.HOMOLOG_DB_PORT }}
