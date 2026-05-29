@@ -89,7 +89,7 @@ jobs:
             DB_USER=${{ secrets.PROD_DB_USER }}
             DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
             DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}
-            DB_SSL=true
+            DB_SSL=false
             SMTP_HOST=${{ secrets.SMTP_HOST }}
             SMTP_PORT=${{ secrets.SMTP_PORT }}
             SMTP_USER=${{ secrets.SMTP_USER }}
