@@ -60,7 +60,7 @@ jobs:
             REPO_RAW="${{ github.repository }}"            
             REPO_LOWER=${REPO_RAW,,}
             
-            cat > .env << EOF
+            cat > .env << 'EOF'
             IMAGE_TAG=ghcr.io/${REPO_LOWER}:homolog
             PORT=${{ secrets.HOMOLOG_PORT }}
             DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
