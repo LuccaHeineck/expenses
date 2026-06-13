@@ -4,33 +4,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   packages: write
 
 jobs:
-  merge-branches:
-    name: Merge Homolog para Main
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configurar Bot Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Executar o Merge
-        run: |
-          git checkout main
-          git pull origin main
-          git merge origin/homolog --no-ff -m "Deploy de homolog em prod"
-          git push origin main
-
   unit-tests:
-    needs: [merge-branches]
     uses: ./.github/workflows/tests.yml
   
   build-and-push:
