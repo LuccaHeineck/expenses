@@ -84,3 +84,29 @@ jobs:
             
             docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
             docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --remove-orphans
+
+  create-pr:
+    name: Criar PR para Main
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Criar ou Atualizar Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: homolog
+          base: main
+          title: "[Release] Homologação para Produção"
+          body: |
+            ## Mudanças prontas para Produção
+            Este PR foi gerado automaticamente após o deploy bem-sucedido no ambiente de homologação.
+            
+            **Por favor, revise os commits abaixo e faça o merge apenas quando estiver aprovado.**
+          labels: |
+            aguardando aprovação
+            release
