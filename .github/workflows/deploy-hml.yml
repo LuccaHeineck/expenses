@@ -91,22 +91,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-      contents: write
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Criar ou Atualizar Pull Request
-        uses: peter-evans/create-pull-request@v6
+      - name: Criar Pull Request de Homolog para Main
+        uses: repo-sync/pull-request@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: homolog
-          base: main
-          title: "[Release] Homologação para Produção"
-          body: |
+          source_branch: "homolog"
+          destination_branch: "main"
+          pr_title: "[Release] Homologação para Produção"
+          pr_body: |
             ## Mudanças prontas para Produção
             Este PR foi gerado automaticamente após o deploy bem-sucedido no ambiente de homologação.
             
-            **Por favor, revise os commits abaixo e faça o merge apenas quando estiver aprovado.**
-          labels: |
-            aguardando aprovação
-            release
+            **Por favor, revise os commits e faça o merge apenas quando estiver aprovado.**
+          pr_label: "aguardando aprovação,release"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
