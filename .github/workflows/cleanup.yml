@@ -41,11 +41,3 @@ jobs:
         run: |
           echo "Removendo pastas em /srv/expenses"
           sudo rm -Rf /srv/expenses
-
-      - name: Remover self-hosted Runner
-        run: |
-          echo "Desinstalando o serviço do Runner..."
-          # Remove o serviço do systemd local do Linux
-          sudo ./svc.sh uninstall || true
-          
-          echo "O runner foi desativado com sucesso. Ele aparecerá como Offline no GitHub."
