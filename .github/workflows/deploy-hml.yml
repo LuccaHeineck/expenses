@@ -22,6 +22,8 @@ jobs:
     needs: [unit-tests]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: homolog
 
       - name: Login no GitHub Container Registry
         uses: docker/login-action@v3
