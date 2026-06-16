@@ -85,7 +85,7 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
           docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
-          docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --remove-orphans
+          docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --force-recreate --remove-orphans
 
   create-pr:
     name: Criar PR para Main
