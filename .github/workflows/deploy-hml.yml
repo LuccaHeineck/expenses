@@ -4,8 +4,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   code-quality:
@@ -43,65 +44,77 @@ jobs:
 
   # Faz o pull da imagem mais recente e reinicia os containers no ambiente de homologação
   deploy:
-      name: Atualizar Homolog
-      runs-on: self-hosted
-      needs: [build-and-push]
-      steps:
-        - name: Baixar arquivos do repositório na VM
-          uses: actions/checkout@v4
+    name: Atualizar Homolog
+    runs-on: self-hosted
+    needs: [build-and-push]
+    steps:
+      - name: Baixar arquivos do repositório na VM
+        uses: actions/checkout@v4
 
-        - name: Mover arquivos para a pasta de Homolog e criar .env
-          run: |
-            cp docker-compose.yml docker-compose.hml.yml /srv/expenses/homolog/
-            
-            cd /srv/expenses/homolog
+      - name: Mover arquivos para a pasta de Homolog e criar .env
+        run: |
+          mkdir -p /srv/expenses/homolog/
+          cp docker-compose.yml docker-compose.hml.yml /srv/expenses/homolog/
+          
+          cd /srv/expenses/homolog
 
-            # Repo convertido para lowercase para GHCR
-            REPO_RAW="${{ github.repository }}"            
-            REPO_LOWER=${REPO_RAW,,}
-            
-            cat > .env << EOF
-            IMAGE_TAG=ghcr.io/${REPO_LOWER}:homolog
-            PORT=${{ secrets.HOMOLOG_PORT }}
-            DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-            DB_PORT=${{ secrets.HOMOLOG_DB_PORT }}
-            DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-            DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
-            DB_DATABASE=${{ secrets.HOMOLOG_DB_DATABASE }}
-            DB_SSL=false
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_USER=${{ secrets.SMTP_USER }}
-            SMTP_PASS=${{ secrets.SMTP_PASS }}
-            NODE_ENV=homolog
-            EOF
-            echo ".env atualizado para homolog"
+          # Repo convertido para lowercase para GHCR
+          REPO_RAW="${{ github.repository }}"            
+          REPO_LOWER=${REPO_RAW,,}
+          
+          cat > .env << EOF
+          IMAGE_TAG=ghcr.io/${REPO_LOWER}:homolog
+          PORT=${{ secrets.HOMOLOG_PORT }}
+          DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
+          DB_PORT=${{ secrets.HOMOLOG_DB_PORT }}
+          DB_USER=${{ secrets.HOMOLOG_DB_USER }}
+          DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
+          DB_DATABASE=${{ secrets.HOMOLOG_DB_DATABASE }}
+          DB_SSL=false
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASS=${{ secrets.SMTP_PASS }}
+          NODE_ENV=homolog
+          EOF
+          echo ".env atualizado para homolog"
 
-        - name: Docker Compose Pull & Up
-          run: |
-            cd /srv/expenses/homolog
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
-            docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --remove-orphans
+      - name: Docker Compose Pull & Up
+        run: |
+          cd /srv/expenses/homolog
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
+          docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --remove-orphans
 
   create-pr:
     name: Criar PR para Main
     needs: [deploy]
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Criar Pull Request de Homolog para Main
-        uses: repo-sync/pull-request@v2
-        with:
-          source_branch: "homolog"
-          destination_branch: "main"
-          pr_title: "[Release] Homologação para Produção"
-          pr_body: |
-            ## Mudanças prontas para Produção
-            Este PR foi gerado automaticamente após o deploy bem-sucedido no ambiente de homologação.
-            
-            **Por favor, revise os commits e faça o merge apenas quando estiver aprovado.**
-          pr_label: "aguardando aprovação,release"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Baixar arquivos do repositório
+        uses: actions/checkout@v4
+
+      - name: Criar ou atualizar a Pull Request via GH CLI
+        run: |
+          PR_EXISTS=$(gh pr list --head homolog --base main --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$PR_EXISTS" ]; then
+            echo "PR já existe (ID: $PR_EXISTS). Atualizando..."
+            gh pr edit $PR_EXISTS \
+              --title "[Release] Homologação para Produção" \
+              --body "Este PR é atualizado automaticamente pelo pipeline de homologação."
+          else
+            echo "Criando uma nova Pull Request estável..."
+            gh pr create \
+              --head homolog \
+              --base main \
+              --title "[Release] Homologação para Produção" \
+              --body "## Mudanças prontas para Produção
+              Este PR foi gerado automaticamente após o deploy bem-sucedido no ambiente de homologação.
+              
+              **Por favor, revise os commits e faça o merge apenas quando estiver aprovado.**" \
+              --label "aguardando aprovação,release"
+          fi
