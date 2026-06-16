@@ -116,5 +116,5 @@ jobs:
               Este PR foi gerado automaticamente após o deploy bem-sucedido no ambiente de homologação.
               
               **Por favor, revise os commits e faça o merge apenas quando estiver aprovado.**" \
-              --label "aguardando aprovação,release"
+              --label "release"
           fi
