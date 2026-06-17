@@ -11,9 +11,13 @@ permissions:
 jobs:
   code-quality:
     uses: ./.github/workflows/eslint.yml
+    with:
+      ref: homolog
 
   unit-tests:
     uses: ./.github/workflows/tests.yml
+    with:
+      ref: homolog
 
   build-and-push:
     name: Buildar e enviar imagem para o GHCR
@@ -51,6 +55,8 @@ jobs:
     steps:
       - name: Baixar arquivos do repositório na VM
         uses: actions/checkout@v4
+        with:
+          ref: homolog
 
       - name: Mover arquivos para a pasta de Homolog e criar .env
         run: |
@@ -97,6 +103,8 @@ jobs:
     steps:
       - name: Baixar arquivos do repositório
         uses: actions/checkout@v4
+        with:
+          ref: homolog
 
       - name: Criar ou atualizar a Pull Request via GH CLI
         run: |

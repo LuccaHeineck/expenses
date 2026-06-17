@@ -7,6 +7,11 @@ on:
     branches: ["main", "homolog"]
   workflow_dispatch:
   workflow_call:
+    inputs:
+      ref:
+        description: "Branch or tag to checkout"
+        required: true
+        type: string
 
 jobs:
   test:
@@ -44,6 +49,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

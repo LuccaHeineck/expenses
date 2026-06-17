@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: ["main", "homolog"]
   workflow_call:
+    inputs:
+      ref:
+        description: "Branch or tag to checkout"
+        required: true
+        type: string
 
 jobs:
   eslint:
@@ -15,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
