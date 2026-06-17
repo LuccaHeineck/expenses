@@ -1,491 +1,523 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Controle de Lançamentos</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
     :root {
-      --bg: #f4f7f5;
-      --bg-shade: #dce8e2;
+      --bg: #f8fafc;
+      /* slate-50 canvas */
       --panel: #ffffff;
-      --text: #1f2933;
-      --muted: #52606d;
-      --line: #d9e2ec;
-      --primary: #12726b;
-      --primary-hover: #0e5e59;
-      --secondary: #334e68;
-      --secondary-hover: #243b53;
-      --danger: #b42318;
-      --danger-hover: #911b11;
-      --success: #1f8a62;
-      --shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
-    }
-
-    .env-badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.86rem;
-      color: #fff;
-      background: var(--primary);
-      text-transform: none;
-    }
-
-    .env-badge.small {
-      padding: 4px 10px;
-      font-size: 0.82rem;
-      vertical-align: middle;
-    }
-
-    .env-badge.prod {
-      background: var(--danger);
-    }
-
-    .env-badge.homolog {
-      background: var(--primary);
+      /* pure white */
+      --text: #0f172a;
+      /* slate-900 */
+      --text-muted: #64748b;
+      /* slate-500 */
+      --line: #e2e8f0;
+      /* slate-200 */
+      --primary: #4f46e5;
+      /* indigo-600 */
+      --primary-hover: #4338ca;
+      --secondary: #64748b;
+      /* slate-500 */
+      --danger: #ef4444;
+      /* red-500 */
+      --success: #10b981;
+      /* emerald-500 */
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.03), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+      --radius-xl: 16px;
+      /* rounded-2xl */
+      --radius-md: 10px;
+      /* rounded-xl */
     }
 
     * {
       box-sizing: border-box;
-      font-family: "Segoe UI", "Gill Sans", "Trebuchet MS", sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at 12% 8%, rgba(18, 114, 107, 0.18), transparent 42%),
-        radial-gradient(circle at 88% 0%, rgba(51, 78, 104, 0.15), transparent 34%),
-        linear-gradient(180deg, var(--bg), var(--bg-shade));
+      background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
     }
 
     main {
-      width: min(1080px, 94vw);
-      margin: 28px auto 40px;
-      display: grid;
-      gap: 18px;
+      width: min(1280px, 94vw);
+      margin: 40px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    .header,
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
+    /* 1. Header minimalista */
     .header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-      background: linear-gradient(130deg, #ffffff 0%, #f3faf7 54%, #edf4fa 100%);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
       align-items: center;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 1;
-    }
-
-    .header::after {
-      content: "";
-      position: absolute;
-      width: 240px;
-      height: 240px;
-      right: -90px;
-      top: -120px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(18, 114, 107, 0.24), transparent 68%);
-      pointer-events: none;
+      padding: 12px 4px;
     }
 
     .title-group {
-      position: relative;
-      z-index: 1;
       display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .title-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
     }
 
     .title-row h1 {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+      letter-spacing: -0.02em;
     }
 
     .subtitle {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    h1, h2 {
+      font-size: 0.875rem;
+      color: var(--text-muted);
       margin: 0;
     }
 
-    h1 {
-      font-size: clamp(1.35rem, 2.3vw, 1.8rem);
-      letter-spacing: 0.02em;
+    .env-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    h2 {
-      font-size: 1.1rem;
-      margin-bottom: 12px;
+    .env-badge.prod {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .env-badge.homolog {
+      background-color: #eff6ff;
+      color: #1d4ed8;
     }
 
     #user {
-      color: var(--muted);
-      font-size: 0.95rem;
-      font-weight: 600;
-      background: #f5fbf8;
-      border: 1px solid #d7ebe2;
-      border-radius: 999px;
-      padding: 8px 12px;
-      position: relative;
-      z-index: 1;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
     }
 
-    form {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+    .header-actions {
+      display: flex;
       gap: 12px;
-      align-items: end;
+      align-items: center;
     }
 
-    form input,
-    form select,
-    form button {
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      padding: 10px 12px;
-      font-size: 0.92rem;
-      background: #fbfdff;
-      color: var(--text);
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(18, 114, 107, 0.14);
-    }
-
-    input[name="descricao"] {
-      grid-column: span 2;
-    }
-
-    input[name="email"] {
-      grid-column: span 2;
-    }
-
-    button {
-      border: none;
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.92rem;
-      transition: transform 120ms ease, filter 120ms ease, background-color 120ms ease;
-    }
-
-    button:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-      filter: brightness(1.02);
-    }
-
+    #export-pdf,
     #logout {
-      width: auto;
-      background: var(--secondary);
-      padding-inline: 16px;
-      position: relative;
-      z-index: 1;
-    }
-
-    #logout:hover {
-      background: var(--secondary-hover);
-    }
-
-    #export-pdf {
-      width: auto;
-      background: var(--primary);
-      padding-inline: 16px;
-      position: relative;
-      z-index: 1;
+      background: var(--panel);
+      color: var(--text-muted);
+      border: 1px solid var(--line);
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
     }
 
     #export-pdf:hover {
-      background: var(--primary-hover);
+      background-color: var(--bg);
+      color: var(--text);
+      border-color: #cbd5e1;
     }
 
-    .table-wrap {
-      overflow: hidden;
+    #logout {
+      color: var(--danger);
+      border-color: #fee2e2;
+      background-color: #fffafb;
     }
 
+    #logout:hover {
+      background-color: #fee2e2;
+      border-color: #fecdd3;
+    }
+
+    /* 2. Cards Modernos */
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(226, 232, 240, 0.6);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .card h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 0;
+      margin-bottom: 24px;
+    }
+
+    /* 3. Formulário Dinâmico & Segmented Controls */
+    form {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.2fr 2fr 1.8fr 1.8fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    form input {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      background-color: #f8fafc;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    form input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: var(--panel);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+
+    /* O Truque: Custom Segmented Control Container */
+    .segmented-control {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      width: 100%;
+      height: 46px;
+      position: relative;
+    }
+
+    .segmented-control input[type="radio"] {
+      display: none;
+      /* Esconde o radio button original */
+    }
+
+    .segmented-control label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 10px 0;
+      cursor: pointer;
+      border-radius: calc(var(--radius-md) - 3px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* Comportamento Dinâmico de Seleção Ativa */
+    .segmented-control input[type="radio"]:checked+label {
+      background: var(--panel);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Estilos específicos baseados no valor selecionado */
+    #tipo-receita:checked+label {
+      color: var(--success);
+    }
+
+    #tipo-despesa:checked+label {
+      color: var(--danger);
+    }
+
+    #situacao-pago:checked+label {
+      color: #0284c7;
+    }
+
+    /* sky-600 */
+    #situacao-pendente:checked+label {
+      color: #d97706;
+    }
+
+    /* amber-600 */
+
+    form button[type="submit"] {
+      padding: 13px 28px;
+      border-radius: var(--radius-md);
+      background-color: var(--text);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      height: 46px;
+    }
+
+    form button[type="submit"]:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    /* 4. Filtros compactos */
     .filters {
       display: grid;
-      grid-template-columns: 0.7fr 2fr 1fr 1fr 1fr 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
+      grid-template-columns: 0.8fr 2fr 1.2fr 1.2fr 1.2fr 1.5fr 1.5fr;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
     }
 
     .filters input,
-    .filters select,
-    .filters button {
+    .filters select {
       width: 100%;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       border: 1px solid var(--line);
       padding: 10px 12px;
-      font-size: 0.9rem;
-      background: #fbfdff;
+      font-size: 0.875rem;
+      background-color: #f8fafc;
       color: var(--text);
+      transition: all 0.2s ease;
     }
 
-    .filters button {
-      background: var(--secondary);
-      color: #fff;
+    .filters input:focus,
+    .filters select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: var(--panel);
     }
 
-    .filters button:hover {
-      background: var(--secondary-hover);
-    }
-
-    #table td input,
-    #table td select {
-      width: 100%;
-      min-width: 0;
-      border-radius: 6px;
-      border: 1px solid var(--line);
-      padding: 6px 8px;
-      font-size: 0.88rem;
-      background: #fbfdff;
+    /* 5. Tabela Minimalista */
+    .table-wrap {
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      table-layout: fixed;
+      text-align: left;
     }
 
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
-      white-space: normal;
-      word-break: break-word;
+    th,
+    td {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.875rem;
     }
 
     th {
-      color: var(--muted);
+      color: var(--text-muted);
       font-weight: 600;
-      background: #eef6f2;
-      font-size: 0.88rem;
-      letter-spacing: 0.01em;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding-bottom: 14px;
+    }
+
+    #table tbody tr {
+      transition: background-color 0.2s ease;
+    }
+
+    #table tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Badges elegantes da Tabela */
+    .badge,
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    .badge-paid {
+      background-color: #e0f2fe;
+      /* sky-100 */
+      color: #0369a1;
+      /* sky-700 */
+    }
+
+    .badge-pending {
+      background-color: #fef3c7;
+      /* amber-100 */
+      color: #b45309;
+      /* amber-700 */
+    }
+
+    .type-receita {
+      background-color: #d1fae5;
+      /* emerald-100 */
+      color: #065f46;
+      /* emerald-800 */
+    }
+
+    .type-despesa {
+      background-color: #ffe4e6;
+      /* rose-100 */
+      color: #9f1239;
+      /* rose-800 */
     }
 
     #table td:last-child {
-      white-space: nowrap;
-      width: 170px;
+      width: 140px;
+      text-align: right;
     }
 
     #table td:last-child button {
-      width: auto;
-      padding: 6px 10px;
-      font-size: 0.82rem;
-      margin-right: 6px;
-      margin-top: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      margin: 0 2px;
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
     }
 
-    #table td:last-child button:last-child {
-      margin-right: 0;
+    #table tbody tr:hover td:last-child button {
+      opacity: 1;
+      visibility: visible;
     }
 
-    .edit,
-    .cancel {
-      background: var(--secondary);
+    .edit {
+      background-color: #f1f5f9;
+      color: #334155;
+      border-color: #e2e8f0 !important;
     }
 
-    .edit:hover,
-    .cancel:hover {
-      background: var(--secondary-hover);
-    }
-
-    .save {
-      background: var(--success);
-    }
-
-    .save:hover {
-      background: #166a4b;
+    .edit:hover {
+      background-color: #e2e8f0;
     }
 
     .del {
-      background: var(--danger);
+      background-color: #fff1f2;
+      color: #df1c1c;
+      border-color: #ffe4e6 !important;
     }
 
     .del:hover {
-      background: var(--danger-hover);
+      background-color: #ffe4e6;
     }
 
-    @media (max-width: 900px) {
+    .save {
+      background-color: #ecfdf5;
+      color: #047857;
+    }
+
+    .cancel {
+      background-color: #f1f5f9;
+      color: #475569;
+    }
+
+    #table td input,
+    #table td select {
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      padding: 6px 10px;
+      font-size: 0.8125rem;
+    }
+
+    /* Responsividade */
+    @media (max-width: 1100px) {
       form {
         grid-template-columns: 1fr 1fr;
       }
 
+      form button[type="submit"] {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 768px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      form button[type="submit"] {
+        grid-column: span 1;
+      }
+
       .filters {
         grid-template-columns: 1fr 1fr;
-      }
-
-      input[name="descricao"] {
-        grid-column: span 2;
-      }
-
-      input[name="email"] {
-        grid-column: span 2;
-      }
-
-      main {
-        width: min(100%, 96vw);
-        margin-top: 18px;
-      }
-
-      .header,
-      .card {
-        border-radius: 14px;
-        padding: 14px;
-      }
-
-      .header {
-        align-items: flex-start;
-      }
-
-      #user {
-        width: 100%;
-      }
-
-      #logout {
-        width: 100%;
       }
 
       #table thead {
         display: none;
       }
 
-      #table,
-      #table tbody,
-      #table tr,
-      #table td {
+      #table tbody tr {
         display: block;
-        width: 100%;
-      }
-
-      #table tr {
         border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 10px;
-        margin-bottom: 10px;
-        background: #fbfefd;
+        border-radius: var(--radius-md);
+        padding: 16px;
+        margin-bottom: 12px;
+        background: var(--panel);
       }
 
       #table td {
-        border: none;
-        padding: 7px 0;
-        display: grid;
-        grid-template-columns: 92px 1fr;
-        gap: 8px;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
+        padding: 8px 0;
+        border-bottom: none;
       }
 
       #table td::before {
         content: attr(data-label);
-        color: var(--muted);
-        font-size: 0.76rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
+        font-weight: 500;
+        color: var(--text-muted);
+        font-size: 0.75rem;
       }
 
       #table td:last-child {
         width: 100%;
-        white-space: normal;
-        grid-template-columns: 1fr;
-      }
-
-      #table td:last-child::before {
-        margin-bottom: 4px;
-      }
-
-      #table td:last-child button {
-        width: calc(50% - 4px);
-        margin-right: 8px;
-      }
-
-      #table td:last-child button:nth-child(3),
-      #table td:last-child button:last-child {
-        margin-right: 0;
-      }
-    }
-
-    @media (max-width: 560px) {
-      form {
-        grid-template-columns: 1fr;
-      }
-
-      .filters {
-        grid-template-columns: 1fr;
-      }
-
-      input[name="descricao"] {
-        grid-column: span 1;
-      }
-
-      input[name="email"] {
-        grid-column: span 1;
-      }
-
-      #table td {
-        grid-template-columns: 1fr;
-      }
-
-      #table td::before {
-        margin-bottom: 2px;
+        justify-content: flex-end;
+        margin-top: 8px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
       }
 
       #table td:last-child button {
-        width: 100%;
-        margin-right: 0;
+        opacity: 1 !important;
+        visibility: visible !important;
+        flex: 1;
+        text-align: center;
       }
     }
-
   </style>
 </head>
+
 <body>
   <main>
     <section class="header">
       <div class="title-group">
         <div class="title-row">
           <h1>Controle Financeiro</h1>
-          <span id="env-badge-title" class="env-badge small"></span>
+          <span id="env-badge-title" class="env-badge"></span>
         </div>
         <p class="subtitle">Cadastre, edite e acompanhe suas receitas e despesas</p>
       </div>
@@ -501,16 +533,23 @@
       <form id="form">
         <input name="descricao" placeholder="Descrição" required />
         <input name="data_lancamento" type="date" required />
-        <input name="valor" type="number" step="0.01" required />
+        <input name="valor" type="number" step="0.01" placeholder="0,00" required />
         <input name="email" type="email" placeholder="Email para receber o aviso" required />
-        <select name="tipo_lancamento">
-          <option value="RECEITA">RECEITA</option>
-          <option value="DESPESA">DESPESA</option>
-        </select>
-        <select name="situacao">
-          <option value="PAGO">PAGO</option>
-          <option value="PENDENTE">PENDENTE</option>
-        </select>
+
+        <div class="segmented-control">
+          <input type="radio" name="tipo_lancamento" id="tipo-receita" value="RECEITA" checked />
+          <label for="tipo-receita">Receita</label>
+          <input type="radio" name="tipo_lancamento" id="tipo-despesa" value="DESPESA" />
+          <label for="tipo-despesa">Despesa</label>
+        </div>
+
+        <div class="segmented-control">
+          <input type="radio" name="situacao" id="situacao-pago" value="PAGO" checked />
+          <label for="situacao-pago">Pago</label>
+          <input type="radio" name="situacao" id="situacao-pendente" value="PENDENTE" />
+          <label for="situacao-pendente">Pendente</label>
+        </div>
+
         <button type="submit">Salvar</button>
       </form>
     </section>
@@ -535,12 +574,68 @@
         </select>
       </div>
       <table id="table">
-        <thead><tr><th>ID</th><th>Descrição</th><th>Data</th><th>Valor</th><th>Tipo</th><th>Situação</th><th>Ações</th></tr></thead>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Descrição</th>
+            <th>Data</th>
+            <th>Valor</th>
+            <th>Tipo</th>
+            <th>Situação</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
     </section>
   </main>
 
   <script src="/app.js"></script>
+  <script>
+    (function () {
+      function renderBadges(root) {
+        const tbody = (root || document).querySelector && (root || document).querySelector('#table tbody');
+        if (!tbody) return;
+
+        for (const td of tbody.querySelectorAll('td[data-label="Situação"]')) {
+          if (td.querySelector('select')) continue;
+          const text = (td.textContent || '').trim();
+          if (!text) continue;
+          if (td.querySelector('.badge')) continue;
+          const span = document.createElement('span');
+          span.className = 'badge ' + (text === 'PAGO' ? 'badge-paid' : text === 'PENDENTE' ? 'badge-pending' : '');
+          span.textContent = text;
+          td.textContent = '';
+          td.appendChild(span);
+        }
+
+        for (const td of tbody.querySelectorAll('td[data-label="Tipo"]')) {
+          if (td.querySelector('select')) continue;
+          const text = (td.textContent || '').trim();
+          if (!text) continue;
+          if (td.querySelector('.type-badge')) continue;
+          const span = document.createElement('span');
+          span.className = 'type-badge ' + (text === 'RECEITA' ? 'type-receita' : text === 'DESPESA' ? 'type-despesa' : '');
+          span.textContent = text;
+          td.textContent = '';
+          td.appendChild(span);
+        }
+      }
+
+      window.addEventListener('load', function () {
+        setTimeout(() => renderBadges(document), 200);
+      });
+
+      const mo = new MutationObserver(function (mutations) {
+        for (const m of mutations) {
+          if (m.type === 'childList' || m.type === 'subtree') {
+            renderBadges(document);
+          }
+        }
+      });
+      mo.observe(document, { childList: true, subtree: true });
+    })();
+  </script>
 </body>
+
 </html>

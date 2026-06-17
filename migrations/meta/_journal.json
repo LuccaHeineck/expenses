@@ -43,13 +43,6 @@
       "when": 1781613950157,
       "tag": "0005_brown_moira_mactaggert",
       "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1781699554982,
-      "tag": "0006_useful_cannonball",
-      "breakpoints": true
     }
   ]
 }
