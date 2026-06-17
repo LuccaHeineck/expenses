@@ -34,6 +34,9 @@ Core technologies used in this project:
 - GitHub Actions workflows
 - Utilities: `dotenv`, `nodemailer`, `pdfkit`,
 
+## Architecture
+![Alt text](GCS.jpg)
+
 ## Getting Started
 
 Quick steps to get the project running locally:
@@ -73,9 +76,6 @@ npm run dev
 ```bash
 npm test
 ```
-
-## Architecture
-![Alt text](GCS.jpg)
 
 ## CI/CD (recommended)
 
