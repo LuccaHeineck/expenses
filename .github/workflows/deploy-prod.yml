@@ -8,13 +8,16 @@ permissions:
   packages: write
 
 jobs:
+  code-quality:
+    uses: ./.github/workflows/eslint.yml
+
   unit-tests:
     uses: ./.github/workflows/tests.yml
-  
+
   build-and-push:
     name: Buildar e enviar imagem para o GHCR
     runs-on: ubuntu-latest
-    needs: [unit-tests]
+    needs: [unit-tests, code-quality]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,45 +44,45 @@ jobs:
 
   # Faz o pull da imagem mais recente e reinicia os containers no ambiente de homologação
   deploy:
-      name: Atualizar Produção
-      runs-on: self-hosted
-      needs: [build-and-push]
-      steps:
-        - name: Baixar arquivos do repositório na VM
-          uses: actions/checkout@v4
-          with:
-            ref: main
+    name: Atualizar Produção
+    runs-on: self-hosted
+    needs: [build-and-push]
+    steps:
+      - name: Baixar arquivos do repositório na VM
+        uses: actions/checkout@v4
+        with:
+          ref: main
 
-        - name: Mover arquivos para a pasta de Produção e criar .env
-          run: |
-            cp docker-compose.yml docker-compose.prod.yml /srv/expenses/prod/
-            
-            cd /srv/expenses/prod
-            
-            REPO_RAW="${{ github.repository }}"
-            REPO_LOWER=${REPO_RAW,,}
-            
-            cat > .env << EOF
-            IMAGE_TAG=ghcr.io/${REPO_LOWER}:latest
-            PORT=${{ secrets.PROD_PORT }}
-            DB_HOST=${{ secrets.PROD_DB_HOST }}
-            DB_PORT=${{ secrets.PROD_DB_PORT }}
-            DB_USER=${{ secrets.PROD_DB_USER }}
-            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
-            DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}
-            DB_SSL=false
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_USER=${{ secrets.SMTP_USER }}
-            SMTP_PASS=${{ secrets.SMTP_PASS }}
-            NODE_ENV=prod
-            EOF
-            echo ".env atualizado para produção"
+      - name: Mover arquivos para a pasta de Produção e criar .env
+        run: |
+          cp docker-compose.yml docker-compose.prod.yml /srv/expenses/prod/
 
-        - name: Docker Compose Pull & Up para Produção
-          run: |
-            cd /srv/expenses/prod
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+          cd /srv/expenses/prod
+
+          REPO_RAW="${{ github.repository }}"
+          REPO_LOWER=${REPO_RAW,,}
+
+          cat > .env << EOF
+          IMAGE_TAG=ghcr.io/${REPO_LOWER}:latest
+          PORT=${{ secrets.PROD_PORT }}
+          DB_HOST=${{ secrets.PROD_DB_HOST }}
+          DB_PORT=${{ secrets.PROD_DB_PORT }}
+          DB_USER=${{ secrets.PROD_DB_USER }}
+          DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+          DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}
+          DB_SSL=false
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASS=${{ secrets.SMTP_PASS }}
+          NODE_ENV=prod
+          EOF
+          echo ".env atualizado para produção"
+
+      - name: Docker Compose Pull & Up para Produção
+        run: |
+          cd /srv/expenses/prod
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
