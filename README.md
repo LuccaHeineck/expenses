@@ -26,11 +26,13 @@ Core technologies used in this project:
 - TypeScript (language)
 - Express (HTTP server)
 - Drizzle ORM / drizzle-kit (DB migrations & ORM)
-- PostgreSQL (`pg` client) by default (configurable)
+- PostgreSQL
 - Jest (tests)
 - ESLint (linter)
 - Docker / Docker Compose (containerization)
-- Utilities: `dotenv`, `nodemailer`, `pdfkit`
+- Husky (pre-commit automation)
+- GitHub Actions workflows
+- Utilities: `dotenv`, `nodemailer`, `pdfkit`,
 
 ## Getting Started
 
@@ -72,10 +74,8 @@ npm run dev
 npm test
 ```
 
-Notes:
-
-- If you prefer SQLite for local development, adjust `src/config.ts` and the `DATABASE_URL` accordingly.
-- CI pipelines in this repo use `npm ci`, `npm test`, Docker builds and `drizzle-kit` migration commands shown in `package.json` scripts.
+## Architecture
+![Alt text](GCS.jpg)
 
 ## CI/CD (recommended)
 
