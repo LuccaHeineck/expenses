@@ -395,21 +395,20 @@ async function loadAndRender() {
 if (location.pathname === "/app") {
   // set environment badges on the page
   const env = String(_env || "").toLowerCase();
-  let badgeText = env;
-  if (env === "prod") {
-    badgeText = "Produção";
-  } else if (env === "homolog") {
-    badgeText = "Homologação";
-  }
+
+  const badgeConfig = {
+    production: { label: "Produção", class: "prod" },
+    prod: { label: "Produção", class: "prod" },
+    homolog: { label: "Homologação", class: "homolog" },
+  };
+
+  const config = badgeConfig[env] || { label: env, class: env };
   const titleBadge = document.getElementById("env-badge-title");
-  const isProd = env === "prod";
-  const isHomolog = env === "homolog";
 
   if (titleBadge) {
-    titleBadge.textContent = badgeText;
+    titleBadge.textContent = config.label;
     titleBadge.classList.remove("prod", "homolog");
-    if (isProd) titleBadge.classList.add("prod");
-    if (isHomolog) titleBadge.classList.add("homolog");
+    titleBadge.classList.add(config.class);
   }
 
   initApp();
