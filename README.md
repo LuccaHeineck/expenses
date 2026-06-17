@@ -28,6 +28,7 @@ Core technologies used in this project:
 - Drizzle ORM / drizzle-kit (DB migrations & ORM)
 - PostgreSQL (`pg` client) by default (configurable)
 - Jest (tests)
+- ESLint (linter)
 - Docker / Docker Compose (containerization)
 - Utilities: `dotenv`, `nodemailer`, `pdfkit`
 
