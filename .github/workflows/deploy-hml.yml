@@ -94,7 +94,7 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
           docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --force-recreate --remove-orphans
 
-  create-pr:
+create-pr:
     name: Criar PR para Main
     needs: [deploy]
     runs-on: ubuntu-latest
@@ -105,9 +105,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: homolog
+          fetch-depth: 0 # Garante que o histórico completo seja baixado para comparar as branches
 
       - name: Criar ou atualizar a Pull Request via GH CLI
         run: |
+          # Atualiza as referências locais das branches para comparação gráfica
+          git fetch origin main homolog
+
+          # Verifica se o PR já existe
           PR_EXISTS=$(gh pr list --head homolog --base main --json number --jq '.[0].number' 2>/dev/null || echo "")
 
           if [ -n "$PR_EXISTS" ]; then
@@ -116,6 +121,14 @@ jobs:
               --title "[Release] Homologação para Produção" \
               --body "Este PR é atualizado automaticamente pelo pipeline de homologação."
           else
+            # Se o PR NÃO existe, precisamos ver se há commits novos para não quebrar o comando gh pr create
+            COMMITS_AHEAD=$(git rev-list --count origin/main..origin/homolog)
+
+            if [ "$COMMITS_AHEAD" -eq "0" ]; then
+              echo "Nenhum commit novo entre homolog e main. Nenhuma PR precisa ser criada."
+              exit 0
+            fi
+
             echo "Criando uma nova Pull Request estável..."
             gh pr create \
               --head homolog \
