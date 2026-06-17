@@ -15,7 +15,8 @@ services:
       retries: 5
 
   app:
-    image: ${IMAGE_TAG}
+    image: ${IMAGE_TAG:-expenses:local}
+    build: .
     restart: unless-stopped
     environment:
       PORT: 3000
@@ -24,6 +25,10 @@ services:
       DB_USER: ${DB_USER:-expenses}
       DB_PASSWORD: ${DB_PASSWORD:-expenses}
       DB_DATABASE: ${DB_DATABASE:-expenses}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
       DB_SSL: false
     depends_on:
       db:
