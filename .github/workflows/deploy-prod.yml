@@ -10,9 +10,13 @@ permissions:
 jobs:
   code-quality:
     uses: ./.github/workflows/eslint.yml
+    with:
+      ref: main
 
   unit-tests:
     uses: ./.github/workflows/tests.yml
+    with:
+      ref: main
 
   build-and-push:
     name: Buildar e enviar imagem para o GHCR
