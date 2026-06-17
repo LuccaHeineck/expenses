@@ -26,10 +26,15 @@ Core technologies used in this project:
 - TypeScript (language)
 - Express (HTTP server)
 - Drizzle ORM / drizzle-kit (DB migrations & ORM)
-- PostgreSQL (`pg` client) by default (configurable)
+- PostgreSQL
 - Jest (tests)
+- ESLint (linter)
 - Docker / Docker Compose (containerization)
 - Utilities: `dotenv`, `nodemailer`, `pdfkit`
+
+## Architecture
+
+![App Architecture](GCS.jpg)
 
 ## Getting Started
 
