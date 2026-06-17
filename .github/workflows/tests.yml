@@ -50,7 +50,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.ref }}
+          ref: ${{ github.event_name == 'workflow_call' && inputs.ref || '' }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
