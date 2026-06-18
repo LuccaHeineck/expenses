@@ -94,7 +94,7 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.hml.yml pull
           docker compose -f docker-compose.yml -f docker-compose.hml.yml up -d --force-recreate --remove-orphans
 
-create-pr:
+  create-pr:
     name: Criar PR para Main
     needs: [deploy]
     runs-on: ubuntu-latest
