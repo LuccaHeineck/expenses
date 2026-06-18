@@ -12,8 +12,6 @@ import { createPageRouter } from './routes/pageRoutes';
 
 dotenv.config();
 
-const inutil = 1;
-
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 app.disable('x-powered-by');
