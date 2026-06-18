@@ -18,10 +18,5 @@ export const lancamento = pgTable('lancamento', {
   usuario_id: integer('usuario_id').notNull().references(() => usuario.id),
 });
 
-export const categoria = pgTable('categoria', {
-  id: serial('id').primaryKey(),
-  nome: varchar('nome', { length: 120 }).notNull(),
-});
-
 export type Usuario = typeof usuario.$inferSelect;
 export type Lancamento = typeof lancamento.$inferSelect;
